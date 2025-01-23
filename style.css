@@ -105,10 +105,20 @@ nav ul li{
     transition: .6s all ease-in-out;
     display: flex;
     align-items: center;
-    gap: .6rem;
+    gap: .68em;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: var(--main-color);
+    transition: .6s all ease-in-out;
 }
 
 nav ul li:hover {
     transform: scale(1.1);
+}
+
+nav ul li a:hover {
     color: var(--active);
 }
+
