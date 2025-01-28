@@ -1,52 +1,96 @@
-<!DOCTYPE html>
-<html lang="ru">
+<!doctype html>
+<html class="no-js" lang="">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Videoscop</title>
-  <link rel="icon" href="free-icon-vision-4233537.png">
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Lookie Lookie!</title>
+  <meta name="description" content="A website that learns to predict where you are looking at. Written in TensorFlow.js">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link href="https://fonts.googleapis.com/css?family=Roboto|Source+Code+Pro" rel="stylesheet">
+  <link rel="stylesheet" href="normalize.css">
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-  <div class="container">
-    <header class="header">
-      <h1 class="header__title">Videoscop</h1>
+  <!--[if lte IE 9]>
+  <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
 
-      <div class="header__video">
-        <video id="webcam" class="header__webcam" width="400" height="300" autoplay></video>
-        <canvas id="overlay" class="header__overlay" width="400" height="300"></canvas>
-      </div>
+  <h1>Videoscop</h1>
+  <canvas id="heatMap"></canvas>
 
-      <button id="settings" class="header__settings-btn">
-        <img src="about/gear.png" id="settings-img" class="header__settings-img" height="50" width="50" alt="Settings">
-      </button>
 
-      <nav class="header__nav" id="nav">
-        <ul class="header__nav-list">
-          <li class="header__nav-item">
-              <img src="about/user.png" class="header__nav-icon" height="30" width="30" alt="Account">
-              <a href="#" class="header__nav-link">Аккаунт</a>
-          </li>
-          <li class="header__nav-item">
-            <img src="about/tosr72yyh1oa4we3m5ami5k3dge5.png" class="header__nav-icon" height="30" width="30" alt="About">
-            <a href="#" class="header__nav-link">О нас</a>
-          </li>
-        </ul>
-      </nav>
-    </header>
-
-    <main class="main">
-        <canvas id="eyes" class="main__eyes" width="150" height="110"></canvas>
-        <button id="train" class="main__train-btn">Попробовать</button>
-        <div id="target" class="main__target">
-            <img src="about/free-icon-vision-4233537.png" class="main__target-img" height="70" width="70" alt="Target">
-        </div>
-    </main>
+  <div id="info" data-content="info">
+    <h3>Здравствуйте</h3>
+    Пожалуйста подключите камеру.
   </div>
+
+  <div id="training">
+    <table>
+      <tr>
+        <td>Примеры обучения</td>
+        <td data-content="n-train">0</td>
+      </tr>
+      <tr>
+        <td>Примеры проверки</td>
+        <td data-content="n-val">0</td>
+      </tr>
+      <tr>
+        <td>Всего обучено</td>
+        <td data-content="n-epochs">0</td>
+      </tr>
+      <tr>
+        <td>Потеря обучения</td>
+        <td data-content="train-loss">?</td>
+      </tr>
+      <tr>
+        <td>Потеря проверки</td>
+        <td data-content="val-loss">?</td>
+      </tr>
+    </table>
+    <div class="buttonwrap">
+      <div class="buttonrow">
+        <button id="start-training" disabled>Начать обучение</button>
+        <button id="reset-model" disabled>Сбросить модель</button>
+      </div>
+      <div class="buttonrow">
+        <button id="draw-heatmap" disabled>Нарисовать тепловую карту</button>
+        <button id="clear-heatmap" disabled>Очистить тепловую карту</button>
+      </div>
+      <div class="buttonrow">
+        <button id="store-data" disabled>Сохранить набор данных</button>
+        <button id="load-data">Загрузить набор данных</button>
+        <input type="file" id="data-uploader">
+      </div>
+      <div class="buttonrow">
+        <button id="store-model" disabled>Сохранить модель</button>
+        <button id="load-model">Загрузить модель</button>
+        <input type="file" id="model-uploader" multiple>
+      </div>
+    </div>
+  </div>
+
+  <video id="webcam" width="400" height="300" autoplay></video>
+  <canvas id="overlay" width="400" height="300"></canvas>
+
+
+  <canvas id="eyes" width="50" height="25"></canvas>
+
+  <div id="target"></div>
 
   <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.5.0"></script>
   <script src="clmtrackr.js"></script>
+  <!-- <script src="script.js"></script> -->
+  <script src="dataset.js"></script>
+  <script src="mouse.js"></script>
+  <script src="facetracker.js"></script>
+  <script src="ui.js"></script>
+  <script src="training.js"></script>
+  <script src="global.js"></script>
+  <script src="heat.js"></script>
   <script src="main.js"></script>
 </body>
 </html>
