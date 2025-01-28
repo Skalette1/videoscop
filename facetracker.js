@@ -57,7 +57,7 @@ $(document).ready(function() {
   
       gumFail: function() {
         ui.showInfo(
-          'There was some problem trying to fetch video from your webcam 😭',
+          'Возникла проблема при попытке получить видео с вашей веб-камеры ',
           true,
         );
       },
@@ -164,7 +164,7 @@ $(document).ready(function() {
       );
     } else {
       ui.showInfo(
-        'Your browser does not seem to support getUserMedia. 😭 This will probably only work in Chrome or Firefox.',
+        '«Ваш браузер, похоже, не поддерживает getUserMedia.Попробуйте в Chrome или Firefox.',
         true,
       );
     }

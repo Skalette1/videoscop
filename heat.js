@@ -35,7 +35,7 @@ window.heatmap = {
   
     drawHeatmap: function(dataset, model) {
       $('#draw-heatmap').prop('disabled', true);
-      $('#draw-heatmap').html('In Progress...');
+      $('#draw-heatmap').html('Загрузка данных');
   
       const heatmap = $('#heatMap')[0];
       const ctx = heatmap.getContext('2d');

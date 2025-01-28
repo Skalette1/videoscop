@@ -96,7 +96,7 @@
       } else if (this.nTrainings == 3) {
         this.state = 'trained_thrice';
         this.showInfo(
-          'If your model is overfitting, remember you can reset it anytime 👻',
+          'Если ваша модель переобучена, помните, что вы можете сбросить ее в любое время ',
         );
       } else if (this.nTrainings == 4) {
         this.state = 'trained_thrice';
