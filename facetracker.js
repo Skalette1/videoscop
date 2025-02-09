@@ -16,8 +16,6 @@ $(document).ready(function() {
       currentEyeRect: null,
   
       adjustVideoProportions: function() {
-        // resize overlay and video if proportions of video are not 4:3
-        // keep same height, just change width
         facetracker.videoWidthInternal = video.videoWidth;
         facetracker.videoHeightInternal = video.videoHeight;
         const proportion =
@@ -32,7 +30,6 @@ $(document).ready(function() {
       gumSuccess: function(stream) {
         ui.onWebcamEnabled();
   
-        // add camera stream if getUserMedia succeeded
         if ('srcObject' in facetracker.video) {
           facetracker.video.srcObject = stream;
         } else {

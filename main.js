@@ -3,7 +3,6 @@ $(document).ready(function() {
   const targetSize = $target.outerWidth();
 
   function moveTarget() {
-    // Move the model target to where we predict the user is looking to
     if (training.currentModel == null || training.inTraining) {
       return;
     }
@@ -29,10 +28,8 @@ $(document).ready(function() {
     a.click();
   }
 
-  // Map functions to keys and buttons:
 
   $('body').keyup(function(e) {
-    // On space key:
     if (e.keyCode === 32 && ui.readyToCollect) {
       dataset.captureExample();
 

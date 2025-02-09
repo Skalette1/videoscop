@@ -160,7 +160,6 @@ window.training = {
       let max = -10000;
       let value;
   
-      // First, find min and max:
       for (x = 0; x < kernelSize; x++) {
         for (y = 0; y < kernelSize; y++) {
           value = weights.arraySync()[x][y][0][filterId];

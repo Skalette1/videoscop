@@ -14,11 +14,8 @@
 </head>
 
 <body>
-  <!--[if lte IE 9]>
-  <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
-  <![endif]-->
 
-  <h1>Videoscop</h1>
+  <h1>Video<span id="recording"><img src="public/record.png" height="50" width="50" alt=""></span>scop</h1>
   <canvas id="heatMap"></canvas>
 
 
@@ -84,12 +81,14 @@
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.5.0"></script>
   <script src="clmtrackr.js"></script>
   <!-- <script src="script.js"></script> -->
+   <script src="recording.js "></script>
   <script src="dataset.js"></script>
   <script src="mouse.js"></script>
   <script src="facetracker.js"></script>
   <script src="ui.js"></script>
   <script src="training.js"></script>
   <script src="global.js"></script>
+  <script src="webWorker.js"></script>
   <script src="heat.js"></script>
   <script src="main.js"></script>
 </body>
