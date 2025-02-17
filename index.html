@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Authorization</title>
+  <link rel="icon" href="public/Untitled_logo_1_free-file.jpg">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <div id="login-form" class="auth-form">
+      <h2>Войти</h2>
+      <form id="login">
+        <div class="email">
+          <input type="email" id="login-email" placeholder="Email" required>
+          <img width="26" height="26" id="email" src="public/user (1).png" alt="user">
+        </div>
+        <div class="password">
+          <input type="password" minlength="6" id="login-password" placeholder="Пароль" required>
+          <img width="26" height="28" id="password" src="public/view.png" alt="password">
+        </div>
+        <label style="display: flex; flex-direction: row-reverse; align-items: center;">
+          <input type="checkbox" id="remember-me" style="margin-right: 12rem;">
+          <div class="">Запомнить<span style="margin-right: .3rem;"></span>меня</div>
+        </label>
+        <div class="privacy-policy">
+          <label for="login-agree" style="display: flex; align-items: center;">
+            <input type="checkbox" id="login-agree" required style="margin-right: 0.5rem;">
+            <div class="polit">
+              Я согласен с <a href="#" target="_blank">политикой приватности</a> и <a href="#" target="_blank">обработкой данных</a>
+            </div>
+          </label>
+        </div>
+        <button type="submit">Войти</button>
+      </form>
+      <button id="guest-login" style="margin-bottom: 1rem;">Войти как гость</button>
+      <label for="show-register">
+        Нет аккаунта?
+      </label>
+      <button id="show-register" style="margin-top: .5rem;">зарегистрироваться</button>
+    </div>
+
+    <div id="register-form" class="auth-form" style="display: none;">
+      <h2>Регистрация</h2>
+      <form id="register">
+        <input type="text" id="register-username" placeholder="Username" required>
+        <div class="password">
+          <input type="password" minlength="6" id="register-password" placeholder="Пароль" required>
+          <img width="26" height="28" id="password" src="public/view.png" alt="password">
+        </div>
+        <input type="email" id="register-email" placeholder="Email" required>
+        <input type="text" id="register-name" placeholder="Name" required> <!-- Добавлено поле name -->
+        <div class="privacy-policy">
+          <label for="register-agree" style="display: flex; align-items: center;">
+            <input type="checkbox" id="register-agree" required style="margin-right: 0.5rem;">
+            <div class="polit">
+              Я согласен с <a href="#" target="_blank">политикой приватности</a> и <a href="#" target="_blank">обработкой данных</a>
+            </div>
+          </label>
+        </div>
+        <button type="submit">Регистрация</button>
+      </form>
+      <button id="show-login">Вернуться</button>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>

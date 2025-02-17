@@ -1,0 +1,136 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #1D1E27;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+  }
+  
+  :root {
+    --main-backgroundColor: #1D1E27;
+    --main-color: #FAFAFA;
+    --active: #E8162E;
+}
+
+  .container {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2rem;
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+  }
+  
+  .auth-form h2 {
+    margin-bottom: 1.5rem;
+    font-size: 2rem;
+    color: #fff;
+  }
+  
+  .auth-form input {
+    width: 100%;
+    padding: 0.75rem;
+    margin: 0.5rem 0;
+    border: none;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    font-size: 1rem;
+    outline: none;
+  }
+  
+  .auth-form input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+  }
+  
+  .auth-form button {
+    width: 100%;
+    padding: 0.75rem;
+    margin: 1rem 0;
+    border: none;
+    border-radius: 8px;
+    background: #ff6f61;
+    color: #fff;
+    font-size: 1rem;
+    cursor: grab;
+    transition: background 0.5s ease;
+  }
+  
+  .auth-form button:hover {
+    background: #ff4a3d;
+  }
+  
+  .privacy-policy {
+    margin: 1rem 0;
+    text-align: left !important;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .privacy-policy input {
+    display: flex;
+  }
+
+  
+  
+  .privacy-policy a {
+    color: #ff6f61;
+    text-decoration: none;
+  }
+  
+  .privacy-policy a:hover {
+    text-decoration: underline;
+  }
+
+  a {
+    color: var(--main-color);
+    text-decoration: none;
+  }
+
+  .privacy-policy input[type='checkbox'] {
+    transform: scale(1.6);
+  }
+
+  #form-pass {
+    position: relative;
+  }
+
+  #password {
+    position: absolute;
+    top: 196px;
+    transform: translateX(170px);
+    cursor: pointer;
+  }
+
+  #login-email {
+    position: relative;
+  }
+
+  #email {
+    position: absolute;
+    top: 136px;
+    transform: translateX(170px);
+  }
+
+  #remember-me {
+    transform: scale(1.7);
+  }
+
+  input[type='checkbox'] {
+    accent-color: var(--active)
+  }
+
+  .privacy-policy label {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+  }
+  
+  .privacy-policy input[type="checkbox"] {
+    margin-right: 0.5rem;
+  }
