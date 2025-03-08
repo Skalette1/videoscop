@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const frameBackwardBtn = document.getElementById('frame-backward');
     const frameForwardBtn = document.getElementById('frame-forward');
     const playPauseBtn = document.getElementById('play-pause');
-    const toggleHeatmapBtn = document.getElementById('toggle-heatmap');
     const heatmapCanvas = document.getElementById('heatmap-canvas');
     const videoSource = document.getElementById('video-source');
 
