@@ -1,0 +1,94 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+}
+
+.player-container {
+    text-align: center;
+}
+
+video {
+    max-width: 50%;
+    height: auto;
+    margin-bottom: 20px;
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+button {
+    cursor: pointer;
+    /* background-color: rgb(130, 130, 130); */
+    border: none;
+    z-index: 11;
+    cursor: pointer;
+    border-radius: 1.2rem;
+    border: none;
+    font-size: 10pt;
+    font-weight: bold;
+    padding: 0.7em;
+    margin: 0.3em;
+    width: 140px;
+    font-family: 'Source Code Pro', monospace;
+    transition: .4s all ease-in-out;
+    border-radius: 5px;
+}
+
+button:hover {
+    background-color: var(#E8162E);
+}
+
+.home {
+    position: fixed;
+    left: 5px;
+    top: 5px;
+}
+
+.player-container {
+    position: relative;
+    display: inline-block;
+}
+
+#video-player {
+    width: 100%;
+    height: auto;
+}
+
+.player-container {
+    position: relative;
+    width: 800px;
+    margin: 0 auto;
+}
+
+#video-player {
+    width: 100%;
+    height: auto;
+}
+
+#heatmap-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Чтобы клики проходили через canvas к видео */
+    display: none; /* По умолчанию скрыт */
+}
+
+.controls {
+    margin-top: 10px;
+    text-align: center;
+}
+
+.controls button {
+    margin: 5px;
+    padding: 10px;
+}

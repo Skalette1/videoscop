@@ -5,6 +5,7 @@ body, html {
     font-family: 'Roboto', sans-serif;
     color: rgba(0, 0, 0, 0.8);
     background-color: var(--main-backgroundColor);
+    margin: 0;
   }
 
   :root {
@@ -28,7 +29,56 @@ h1 {
 h1:hover {
     font-size: 3.6rem;
 }
+
+.settings button {
+  background-color: transparent;
+  position: fixed;
+  top: 0;
+  right: 0;
+}
   
+.settings button img:hover {
+  transition: .9s all ease-in-out;
+  transform: rotate(360deg);
+  background-color: transparent;
+}
+
+.sidebar {
+  position: fixed;
+  right: -500px;
+  height: 100%;
+  width: 330px;
+  border: 2px inset var(--main-color);
+  border-right: none;
+  border-radius: 2rem .3rem;
+  margin: 0;
+  padding-top: 1rem;
+  z-index: 1000;
+  background: linear-gradient(30deg, #E8162E 5%, 43%, #1D1E27 100%);;
+  box-shadow: 1px 1px 1px 2px var(--main-color);
+  font-size: 1.1rem;
+  font-weight: bold;
+  font-family: 'Times New Roman', Times, serif;
+  transition: .8s all ease-in-out;
+}
+
+.sidebar.open {
+  right: 0;
+}
+
+.sidebar ul  {
+  color: var(--main-color);
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1.3rem;
+}
+
+.sidebar ul li {
+  cursor: pointer;
+  transition: .4s all ease-in-out;
+}
+
   #webcam, #overlay {
     position: absolute;
     top: 0;
@@ -63,6 +113,11 @@ h1:hover {
     text-decoration: none;
   }
 
+  .sidebar ul li:hover {
+    transform: scale(1.1);
+    text-decoration: underline;
+  }
+
   #info {
     position: absolute;
     top: 70%;
@@ -94,8 +149,8 @@ h1:hover {
   
   #training {
     position: absolute;
-    top: 0;
-    right: 0;
+    bottom: 0;
+    left: 0;
     width: 400px;
     background-color: rgb(130, 130, 130);
     padding: 0.5em;
@@ -141,7 +196,7 @@ h1:hover {
     border-bottom: 2px solid;
   }
   
-  button:hover {
+  .main button:hover {
     background-color: var(--active);
     color: var(--main-color);
   }
@@ -166,7 +221,49 @@ h1:hover {
     vertical-align: middle;
     transition: .6s all ease-in-out;
   }
+
+  #video-uploader {
+    display: none;
+}
+
+.custom-file-upload {
+    display: inline-block;
+    position: relative;
+    z-index: 11;
+    cursor: pointer;
+    border-radius: 1.2rem;
+    font-size: 10pt;
+    font-weight: bold;
+    background-color: #fff;
+    color: #3b3c3f;
+    padding: .6rem 0.5em;
+    margin: 0.3em;
+    width: 140px;
+    font-family: 'Source Code Pro', monospace;
+    transition: .4s all ease-in-out;
+    transition: background-color 0.3s ease; 
+}
+
+.custom-file-upload:hover {
+    background-color: var(--active);
+    color: var(--main-color); 
+}
+
+.custom-file-upload i {
+    margin-right: 8px; 
+}
   
+.video-upload {
+  display: inline;
+}
+
+.buttonrow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+}
+
 
 @keyframes pulse {
   0% {

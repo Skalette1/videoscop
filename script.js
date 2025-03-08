@@ -7,14 +7,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginDiv = document.getElementById('login-form');
     const registerDiv = document.getElementById('register-form');
 
-    // Переключение видимости пароля
     const loginPasswordField = document.getElementById('login-password');
     const registerPasswordField = document.getElementById('register-password');
     const passwordIcons = document.querySelectorAll('#password');
 
     passwordIcons.forEach(icon => {
         icon.addEventListener('click', () => {
-            const passwordField = icon.previousElementSibling; // Получаем поле пароля
+            const passwordField = icon.previousElementSibling;
             if (passwordField.getAttribute('type') === "password") {
                 passwordField.setAttribute('type', 'text');
             } else {
@@ -23,7 +22,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Переключение между формами
     showRegisterBtn.addEventListener('click', () => {
         loginDiv.style.display = 'none';
         registerDiv.style.display = 'block';
@@ -34,7 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
         loginDiv.style.display = 'block';
     });
 
-    // Обработка входа
     loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
 
@@ -50,13 +47,23 @@ document.addEventListener('DOMContentLoaded', () => {
             role: 'user'
         };
 
-        if (userData.remember) {
-            localStorage.setItem('currentUser', JSON.stringify(userData));
+        const users = JSON.parse(localStorage.getItem('users')) || [];
+        const foundUser = users.find(user => user.email === userData.email && user.password === userData.password);
+
+        if (!foundUser) {
+            alert('Неверный email или пароль.');
+            return;
         }
+
+        if (userData.remember) {
+            localStorage.setItem('currentUser', JSON.stringify(foundUser)); 
+        } else {
+            sessionStorage.setItem('currentUser', JSON.stringify(foundUser)); 
+        }
+
         window.location.href = 'home.html';
     });
 
-    // Обработка регистрации
     registerForm.addEventListener('submit', (e) => {
         e.preventDefault();
 
@@ -69,11 +76,10 @@ document.addEventListener('DOMContentLoaded', () => {
             username: document.getElementById('register-username').value,
             password: document.getElementById('register-password').value,
             email: document.getElementById('register-email').value,
-            name: document.getElementById('register-name').value, // Используем поле name
+            name: document.getElementById('register-name').value,
             role: 'user'
         };
 
-        // Проверка уникальности пользователя
         const users = JSON.parse(localStorage.getItem('users')) || [];
         if (users.some(user => user.email === newUser.email)) {
             alert('Пользователь с таким email уже существует!');
@@ -81,12 +87,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         users.push(newUser);
-        localStorage.setItem('users', JSON.stringify(users));
-        localStorage.setItem('currentUser', JSON.stringify(newUser));
+        localStorage.setItem('users', JSON.stringify(users)); 
+        localStorage.setItem('currentUser', JSON.stringify(newUser)); 
         window.location.href = 'home.html';
     });
 
-    // Гостевой вход
     guestLoginBtn.addEventListener('click', () => {
         if (!document.getElementById('login-agree').checked) {
             alert('Пожалуйста, согласитесь с политикой конфиденциальности.');
@@ -102,9 +107,50 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = 'home.html';
     });
 
-    // Автопроверка авторизации
-    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-    if (currentUser) {
-        window.location.href = 'home.html';
+    const currentUser = JSON.parse(localStorage.getItem('currentUser')) || JSON.parse(sessionStorage.getItem('currentUser'));
+
+    if (currentUser && window.location.pathname.endsWith('index.html')) {
+        window.location.href = 'home.html'; 
+    } else if (!currentUser && !window.location.pathname.endsWith('index.html')) {
+        window.location.href = 'index.html'; 
     }
 });
+
+const settings = document.querySelector('.settings');
+const sidebar = document.querySelector('.sidebar');
+
+settings.addEventListener('click', () => {
+    sidebar.classList.toggle('open');
+});
+
+const exit = document.getElementById('exit');
+exit.addEventListener('click', () => {
+    localStorage.removeItem('currentUser'); 
+    sessionStorage.removeItem('currentUser'); 
+    window.location.href = 'index.html'; 
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const videoUploader = document.getElementById('video-uploader');
+    const uploadedVideo = document.getElementById('uploaded-video');
+
+    videoUploader.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const url = URL.createObjectURL(file);
+            uploadedVideo.src = url;
+            uploadedVideo.style.display = 'block';
+            uploadedVideo.play();
+        }
+    });
+});
+
+document.getElementById('video-uploader').addEventListener('change', function() {
+    const fileName = this.files[0] ? this.files[0].name : "Загрузить видео";
+    document.querySelector('.custom-file-upload').textContent = fileName;
+});
+
+const player = document.getElementById('player')
+player.addEventListener('click', () => {
+    window.location.href = 'player.html'
+})

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Видео плеер</title>
+    <link rel="stylesheet" href="player.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="home.css">
+</head>
+
+<body>
+    <header>
+        <div class="home">
+            <h1>Video<span id="recording"><img src="public/record.png" height="50" width="50" alt=""></span>scop</h1>
+            <navbar>
+                <button id="player">player</button>
+            </navbar>
+        </div>
+        <div class="settings">
+            <button><img src="public/settings.png" alt="" height="55" width="55"></button>
+        </div>
+    </header>
+    <div class="sidebar">
+        <ul>
+            <li id="exit">Выход из профиля</li>
+            <li><a href="#">О нас</a></li>
+            <li><a href="#">Политика конфиденциальности</a></li>
+            <li id="go-to-home">На главную</li>
+        </ul>
+    </div>
+
+    <div class="player-container">
+        <video id="video-player" controls>
+            <source id="video-source" type="video/webm">
+            Ваш браузер не поддерживает элемент video.
+        </video>
+
+        <!-- Canvas для тепловой карты -->
+        <canvas id="heatmap-canvas"></canvas>
+
+        <div class="controls">
+            <button id="frame-backward">Назад на кадр</button>
+            <button id="frame-forward">Вперед на кадр</button>
+            <button id="play-pause">Воспроизвести/Пауза</button>
+            <button id="toggle-heatmap">Включить/Выключить тепловую карту</button>
+        </div>
+    </div>
+
+    <script src="player.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>

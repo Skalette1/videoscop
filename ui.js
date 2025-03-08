@@ -5,12 +5,10 @@
     nTrainings: 0,
   
     setContent: function(key, value) {
-      // Set an element's content based on the data-content key.
       $('[data-content="' + key + '"]').html(value);
     },
   
     showInfo: function(text, dontFlash) {
-      // Show info and beep / flash.
       this.setContent('info', text);
       if (!dontFlash) {
         $('#info').addClass('flash');
@@ -39,7 +37,6 @@
     },
   
     onAddExample: function(nTrain, nVal) {
-      // Call this when an example is added.
       this.nExamples = nTrain + nVal;
       this.setContent('n-train', nTrain);
       this.setContent('n-val', nVal);
@@ -71,7 +68,6 @@
     },
   
     onFinishTraining: function() {
-      // Call this when training is finished.
       this.nTrainings += 1;
       $('#target').css('opacity', '0.9');
       $('#draw-heatmap').prop('disabled', false);

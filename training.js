@@ -53,7 +53,6 @@ window.training = {
     },
   
     fitModel: function() {
-      // TODO Set params in UI?
       this.inTraining = true;
       const epochs = 10;
   
@@ -95,12 +94,10 @@ window.training = {
             ui.setContent('val-loss', logs.val_loss.toFixed(5));
   
             if (logs.val_loss < bestValLoss) {
-              // Save model
               bestEpoch = epoch;
               bestTrainLoss = logs.loss;
               bestValLoss = logs.val_loss;
   
-              // Store best model:
               await training.currentModel.save(bestModelPath);
             }
   
@@ -109,7 +106,6 @@ window.training = {
           onTrainEnd: async function() {
             console.info('Finished training');
   
-            // Load best model:
             training.epochsTrained -= epochs - bestEpoch;
             console.info('Loading best epoch:', training.epochsTrained);
             ui.setContent('n-epochs', training.epochsTrained);
@@ -138,7 +134,6 @@ window.training = {
     },
   
     getPrediction: async function() {
-      // Return relative x, y where we expect the user to look right now.
       const rawImg = dataset.getImage();
       const img = await dataset.convertImage(rawImg);
       const metaInfos = dataset.getMetaInfos();

@@ -95,3 +95,12 @@ $(document).ready(function() {
     ui.onFinishTraining();
   });
 });
+
+document.getElementById('draw-heatmap').addEventListener('click', () => {
+  heatmap.drawHeatmap(dataset, training.currentModel);
+});
+
+document.getElementById('clear-heatmap').addEventListener('click', () => {
+  heatmap.clearHeatmap();
+});
+

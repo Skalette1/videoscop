@@ -11,68 +11,68 @@
   <link rel="stylesheet" href="normalize.css">
   <link rel="icon" href="public/Untitled_logo_1_free-file.jpg">
   <link rel="stylesheet" href="home.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
-<!-- ы -->
-<body>
-  <h1>Video<span id="recording"><img src="public/record.png" height="50" width="50" alt=""></span>scop</h1>
-  <canvas id="heatMap"></canvas>
 
-  <div id="info" data-content="info">
-    <h3>Здравствуйте</h3>
-    Пожалуйста подключите камеру.
+<body>
+  <header>
+    <div class="home">
+      <h1>Video<span id="recording"><img src="public/record.png" height="50" width="50" alt=""></span>scop</h1>
+      <navbar>
+        <button id="player">player</button>
+      </navbar>
+    </div>
+    <div class="settings">
+      <button><img src="public/settings.png" alt="" height="55" width="55"></button>
+    </div>
+  </header>
+  <div class="sidebar">
+    <ul>
+      <li id="exit">Выход из профиля</li>
+      <li><a href="#">О нас</a></li>
+      <li><a href="#">Политика конфиденциальности</a></li>
+    </ul>
   </div>
 
-  <div id="training">
-    <table>
-      <tr>
-        <td>Примеры обучения</td>
-        <td data-content="n-train">0</td>
-      </tr>
-      <tr>
-        <td>Примеры проверки</td>
-        <td data-content="n-val">0</td>
-      </tr>
-      <tr>
-        <td>Всего обучено</td>
-        <td data-content="n-epochs">0</td>
-      </tr>
-      <tr>
-        <td>Потеря обучения</td>
-        <td data-content="train-loss">?</td>
-      </tr>
-      <tr>
-        <td>Потеря проверки</td>
-        <td data-content="val-loss">?</td>
-      </tr>
-    </table>
-    <div class="buttonwrap">
-      <div class="buttonrow">
-        <button id="start-training" disabled>Начать обучение</button>
-        <button id="reset-model" disabled>Сбросить модель</button>
-      </div>
-      <div class="buttonrow">
-        <button id="draw-heatmap" disabled>Нарисовать тепловую карту</button>
-        <button id="clear-heatmap" disabled>Очистить тепловую карту</button>
-      </div>
-      <div class="buttonrow">
-        <button id="store-data" disabled>Сохранить набор данных</button>
-        <button id="load-data">Загрузить набор данных</button>
-        <input type="file" id="data-uploader">
-      </div>
-      <div class="buttonrow">
-        <button id="store-model" disabled>Сохранить модель</button>
-        <button id="load-model">Загрузить модель</button>
-        <input type="file" id="model-uploader" multiple>
+  <div class="main">
+    <canvas id="heatMap"></canvas>
+
+    <div id="info" data-content="info">
+      <h3>Здравствуйте</h3>
+      Пожалуйста подключите камеру.
+    </div>
+
+    <div id="training">
+      <div class="buttonwrap">
+        <div class="buttonrow">
+          <button id="start-recording" style="padding: 1rem;">Начать запись</button>
+          <button id="stop-recording" disabled>Остановить запись</button>
+          <button id="finish-recording" disabled>Завершить запись</button>
+            <div class="video-upload">
+              <label for="video-uploader" class="custom-file-upload">
+                <i class="fas fa-upload"></i> Загрузить видео
+              </label>
+              <input type="file" id="video-uploader" accept="video/*">
+              <video id="uploaded-video" controls style="display: none;"></video>
+            </div>
+          </div>
+        <div class="buttonrow">
+          <button id="start-training" disabled>Начало записи</button>
+          <button id="reset-model" disabled>Сбросить модель</button>
+        </div>
+        <div class="buttonrow">
+          <button id="draw-heatmap" disabled>Нарисовать тепловую карту</button>
+          <button id="clear-heatmap" disabled>Очистить тепловую карту</button>
+        </div>
       </div>
     </div>
   </div>
 
   <video id="webcam" width="400" height="300" autoplay></video>
   <canvas id="overlay" width="400" height="300"></canvas>
-
   <canvas id="eyes" width="50" height="25"></canvas>
-
   <div id="target"></div>
+
   <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.5.0"></script>
   <script src="clmtrackr.js"></script>
@@ -83,8 +83,9 @@
   <script src="ui.js"></script>
   <script src="training.js"></script>
   <script src="global.js"></script>
-  <script src="webWorker.js"></script>
   <script src="heat.js"></script>
   <script src="main.js"></script>
+  <script src="script.js"></script>
+  <script src="entry.js"></script>
 </body>
 </html>
