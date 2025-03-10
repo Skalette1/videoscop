@@ -1,16 +1,16 @@
 <!doctype html>
-<html class="no-js" lang="">
+<html lang="ru">
 <head>
   <meta charset="utf-8">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
-  <title>Lookie Lookie!</title>
+  <title>Videoscop</title>
   <meta name="description" content="A website that learns to predict where you are looking at. Written in TensorFlow.js">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
   <link href="https://fonts.googleapis.com/css?family=Roboto|Source+Code+Pro" rel="stylesheet">
   <link rel="stylesheet" href="normalize.css">
   <link rel="icon" href="public/Untitled_logo_1_free-file.jpg">
-  <link rel="stylesheet" href="home.css">
+  <link rel="stylesheet" href="styles/home.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 
@@ -26,6 +26,7 @@
       <button><img src="public/settings.png" alt="" height="55" width="55"></button>
     </div>
   </header>
+  
   <div class="sidebar">
     <ul>
       <li id="exit">Выход из профиля</li>
@@ -48,14 +49,14 @@
           <button id="start-recording" style="padding: 1rem;">Начать запись</button>
           <button id="stop-recording" disabled>Остановить запись</button>
           <button id="finish-recording" disabled>Завершить запись</button>
-            <div class="video-upload">
-              <label for="video-uploader" class="custom-file-upload">
-                <i class="fas fa-upload"></i> Загрузить видео
-              </label>
-              <input type="file" id="video-uploader" accept="video/*">
-              <video id="uploaded-video" controls style="display: none;"></video>
-            </div>
+          <div class="video-upload">
+            <label for="video-uploader" class="custom-file-upload">
+              <i class="fas fa-upload"></i> Загрузить видео
+            </label>
+            <input type="file" id="video-uploader" accept="video/*">
+            <video id="uploaded-video" controls style="display: none;"></video>
           </div>
+        </div>
         <div class="buttonrow">
           <button id="start-training" disabled>Начало записи</button>
           <button id="reset-model" disabled>Сбросить модель</button>
@@ -64,7 +65,7 @@
           <button id="draw-heatmap" disabled>Нарисовать тепловую карту</button>
           <button id="clear-heatmap" disabled>Очистить тепловую карту</button>
         </div>
-      </div>
+      </div> 
     </div>
   </div>
 
@@ -79,13 +80,97 @@
   <script src="recording.js"></script>
   <script src="dataset.js"></script>
   <script src="mouse.js"></script>
-  <script src="facetracker.js"></script>
+  <!-- <script src="facetracker.js"></script> -->
   <script src="ui.js"></script>
   <script src="training.js"></script>
   <script src="global.js"></script>
   <script src="heat.js"></script>
   <script src="main.js"></script>
   <script src="script.js"></script>
-  <script src="entry.js"></script>
+
+
+  <script>
+    let mediaRecorder;
+    let recordedChunks = [];
+    let isRecording = false;
+  
+    const startRecordingButton = document.getElementById('start-recording');
+    const stopRecordingButton = document.getElementById('stop-recording');
+    const finishRecordingButton = document.getElementById('finish-recording');
+  
+    // Начало записи
+    startRecordingButton.addEventListener('click', async () => {
+      try {
+        const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
+        mediaRecorder = new MediaRecorder(stream);
+  
+        mediaRecorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            recordedChunks.push(event.data);
+          }
+        };
+  
+        mediaRecorder.onstop = () => {
+          const blob = new Blob(recordedChunks, { type: 'video/webm' });
+          
+          // Сохранение Blob-объекта в localStorage как строку (Base64)
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            localStorage.setItem('videoBlob', reader.result); // Сохраняем в localStorage
+          };
+          reader.readAsDataURL(blob); // Преобразуем Blob в строку Base64
+  
+          // Переход на страницу плеера
+          window.location.href = 'player.html';
+        };
+  
+        mediaRecorder.start();
+        isRecording = true;
+  
+        stopRecordingButton.disabled = false;
+        finishRecordingButton.disabled = false;
+        startRecordingButton.disabled = true;
+      } catch (error) {
+        console.error('Ошибка при записи экрана:', error);
+      }
+    });
+  
+    // Остановка записи
+    stopRecordingButton.addEventListener('click', () => {
+      if (mediaRecorder && isRecording) {
+        mediaRecorder.stop();
+        isRecording = false;
+  
+        stopRecordingButton.disabled = true;
+        finishRecordingButton.disabled = true;
+        startRecordingButton.disabled = false;
+      }
+    });
+  
+    // Завершение записи
+    finishRecordingButton.addEventListener('click', async () => {
+      if (mediaRecorder && isRecording) {
+        mediaRecorder.stop();
+        isRecording = false;
+  
+        stopRecordingButton.disabled = true;
+        finishRecordingButton.disabled = true;
+        startRecordingButton.disabled = false;
+  
+        const blob = new Blob(recordedChunks, { type: 'video/webm' });
+  
+        // Сохранение Blob-объекта в localStorage как строку (Base64)
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          localStorage.setItem('videoBlob', reader.result); // Сохраняем в localStorage
+        };
+        reader.readAsDataURL(blob); // Преобразуем Blob в строку Base64
+  
+        // Переход на страницу плеера
+        window.location.href = 'player.html';
+      }
+    });
+  </script>
+  
 </body>
 </html>

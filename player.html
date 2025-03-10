@@ -1,13 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Видео плеер</title>
-    <link rel="stylesheet" href="player.css">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="home.css">
+    <link rel="stylesheet" href="styles/player.css">
+    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/home.css">
 </head>
 
 <body>
@@ -22,7 +21,8 @@
             <button><img src="public/settings.png" alt="" height="55" width="55"></button>
         </div>
     </header>
-    <div class="sidebar">
+
+    <div class="sidebar" style="transform: translateY(20%);">
         <ul>
             <li id="exit">Выход из профиля</li>
             <li><a href="#">О нас</a></li>
@@ -47,9 +47,76 @@
             <button id="toggle-heatmap">Включить/Выключить тепловую карту</button>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          const videoPlayer = document.getElementById('video-player');
+          const heatmapCanvas = document.getElementById('heatmap-canvas');
+          const ctx = heatmapCanvas.getContext('2d');
+          const playPauseButton = document.getElementById('play-pause');
+          const frameBackwardButton = document.getElementById('frame-backward');
+          const frameForwardButton = document.getElementById('frame-forward');
+          const toggleHeatmapButton = document.getElementById('toggle-heatmap');
+      
+          let isHeatmapVisible = false;
+      
+          // Загружаем видео из localStorage
+          const videoData = localStorage.getItem('videoBlob');
+          if (videoData) {
+            const videoBlob = dataURLToBlob(videoData);
+            const videoSource = document.getElementById('video-source');
+            videoSource.src = URL.createObjectURL(videoBlob);
+            videoPlayer.load();
+          } else {
+            alert('Видео не найдено!');
+          }
+      
+          // Управление воспроизведением видео
+          playPauseButton.addEventListener('click', () => {
+            if (videoPlayer.paused) {
+              videoPlayer.play();
+              playPauseButton.textContent = 'Пауза'; // Изменяем текст на кнопке
+            } else {
+              videoPlayer.pause();
+              playPauseButton.textContent = 'Воспроизвести'; // Изменяем текст на кнопке
+            }
+          });
+      
+          // Перемещение на один кадр назад
+          frameBackwardButton.addEventListener('click', () => {
+            videoPlayer.currentTime = Math.max(0, videoPlayer.currentTime - 0.04); // Перемещаем назад на 1/25 секунды
+          });
+      
+          // Перемещение на один кадр вперед
+          frameForwardButton.addEventListener('click', () => {
+            videoPlayer.currentTime = Math.min(videoPlayer.duration, videoPlayer.currentTime + 0.04); // Перемещаем вперед на 1/25 секунды
+          });
+      
+          // Переключение тепловой карты
+          toggleHeatmapButton.addEventListener('click', () => {
+            isHeatmapVisible = !isHeatmapVisible;
+            if (isHeatmapVisible) {
+              heatmapCanvas.style.display = 'block'; // Показываем тепловую карту
+            } else {
+              heatmapCanvas.style.display = 'none'; // Скрываем тепловую карту
+            }
+          });
+        });
+      
+        // Функция для преобразования строки Base64 в Blob
+        function dataURLToBlob(dataURL) {
+          const byteString = atob(dataURL.split(',')[1]);
+          const arrayBuffer = new ArrayBuffer(byteString.length);
+          const uintArray = new Uint8Array(arrayBuffer);
+      
+          for (let i = 0; i < byteString.length; i++) {
+            uintArray[i] = byteString.charCodeAt(i);
+          }
+      
+          return new Blob([uintArray], { type: 'video/webm' });
+        }
+      </script>
+      
+      
 
-    <script src="player.js"></script>
-    <script src="script.js"></script>
 </body>
-
 </html>

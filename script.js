@@ -130,21 +130,25 @@ exit.addEventListener('click', () => {
     window.location.href = 'index.html'; 
 });
 
+
+
 document.addEventListener('DOMContentLoaded', () => {
     const videoUploader = document.getElementById('video-uploader');
-    const uploadedVideo = document.getElementById('uploaded-video');
-
-    videoUploader.addEventListener('change', (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            const url = URL.createObjectURL(file);
-            uploadedVideo.src = url;
-            uploadedVideo.style.display = 'block';
-            uploadedVideo.play();
-        }
-    });
+    if (videoUploader) {
+        videoUploader.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const url = URL.createObjectURL(file);
+                const uploadedVideo = document.getElementById('uploaded-video');
+                if (uploadedVideo) {
+                    uploadedVideo.src = url;
+                    uploadedVideo.style.display = 'block';
+                    uploadedVideo.play();
+                }
+            }
+        });
+    }
 });
-
 document.getElementById('video-uploader').addEventListener('change', function() {
     const fileName = this.files[0] ? this.files[0].name : "Загрузить видео";
     document.querySelector('.custom-file-upload').textContent = fileName;

@@ -1,0 +1,1247 @@
+//dataset.js window.dataset = {
+    inputWidth: $('#eyes').width(),
+    inputHeight: $('#eyes').height(),
+    train: {
+      n: 0,
+      x: null,
+      y: null,
+    },
+    val: {
+      n: 0,
+      x: null,
+      y: null,
+    },
+  
+    getImage: function() {
+      // Capture the current image in the eyes canvas as a tensor.
+      return tf.tidy(function() {
+        const image = tf.browser.fromPixels(document.getElementById('eyes'));
+        const batchedImage = image.expandDims(0);
+        return batchedImage
+          .toFloat()
+          .div(tf.scalar(127))
+          .sub(tf.scalar(1));
+      });
+    },
+  
+    getMetaInfos: function(mirror) {
+      // Get some meta info about the rectangle as a tensor:
+      // - middle x, y of the eye rectangle, relative to video size
+      // - size of eye rectangle, relative to video size
+      // - angle of rectangle (TODO)
+      let x = facetracker.currentEyeRect[0] + facetracker.currentEyeRect[2] / 2;
+      let y = facetracker.currentEyeRect[1] + facetracker.currentEyeRect[3] / 2;
+  
+      x = (x / facetracker.videoWidthExternal) * 2 - 1;
+      y = (y / facetracker.videoHeightExternal) * 2 - 1;
+  
+      const rectWidth =
+        facetracker.currentEyeRect[2] / facetracker.videoWidthExternal;
+      const rectHeight =
+        facetracker.currentEyeRect[3] / facetracker.videoHeightExternal;
+  
+      if (mirror) {
+        x = 1 - x;
+        y = 1 - y;
+      }
+      return tf.tidy(function() {
+        return tf.tensor1d([x, y, rectWidth, rectHeight]).expandDims(0);
+      });
+    },
+  
+    whichDataset: function() {
+      // Returns 'train' or 'val' depending on what makes sense / is random.
+      if (dataset.train.n == 0) {
+        return 'train';
+      }
+      if (dataset.val.n == 0) {
+        return 'val';
+      }
+      return Math.random() < 0.2 ? 'val' : 'train';
+    },
+  
+    rgbToGrayscale(imageArray, n, x, y) {
+      // Given an rgb array and positions, returns a grayscale value.
+      // Inspired by http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0029740
+      let r = (imageArray[n][x][y][0] + 1) / 2;
+      let g = (imageArray[n][x][y][1] + 1) / 2;
+      let b = (imageArray[n][x][y][2] + 1) / 2;
+  
+      // Gamma correction:
+      const exponent = 1 / 2.2;
+      r = Math.pow(r, exponent);
+      g = Math.pow(g, exponent);
+      b = Math.pow(b, exponent);
+  
+      // Gleam:
+      const gleam = (r + g + b) / 3;
+      return gleam * 2 - 1;
+    },
+  
+    convertImage: async function(image) {
+      // Convert to grayscale and add spatial info
+      const imageShape = image.shape;
+      const imageArray = await image.array();
+      const w = imageShape[1];
+      const h = imageShape[2];
+  
+      const data = [new Array(w)];
+      const promises = [];
+      for (let x = 0; x < w; x++) {
+        data[0][x] = new Array(h);
+  
+        for (let y = 0; y < h; y++) {
+          const grayValue = dataset.rgbToGrayscale(imageArray, 0, x, y);
+          data[0][x][y] = [grayValue, (x / w) * 2 - 1, (y / h) * 2 - 1];
+        }
+      }
+  
+      await Promise.all(promises);
+  
+      return tf.tensor(data);
+    },
+  
+    addToDataset: function(image, metaInfos, target, key) {
+      // Add the given x, y to either 'train' or 'val'.
+      const set = dataset[key];
+  
+      if (set.x == null) {
+        set.x = [tf.keep(image), tf.keep(metaInfos)];
+        set.y = tf.keep(target);
+      } else {
+        const oldImage = set.x[0];
+        set.x[0] = tf.keep(oldImage.concat(image, 0));
+  
+        const oldEyePos = set.x[1];
+        set.x[1] = tf.keep(oldEyePos.concat(metaInfos, 0));
+  
+        const oldY = set.y;
+        set.y = tf.keep(oldY.concat(target, 0));
+  
+        tf.dispose([oldImage, oldEyePos, oldY, target]);
+      }
+  
+      set.n += 1;
+    },
+  
+    addExample: async function(image, metaInfos, target, dontDispose) {
+      // Given an image, eye pos and target coordinates, adds them to our dataset.
+      target[0] = target[0] - 0.5;
+      target[1] = target[1] - 0.5;
+      target = tf.keep(
+        tf.tidy(function() {
+          return tf.tensor1d(target).expandDims(0);
+        }),
+      );
+      const key = dataset.whichDataset();
+  
+      const convertedImage = await dataset.convertImage(image);
+  
+      dataset.addToDataset(convertedImage, metaInfos, target, key);
+  
+      ui.onAddExample(dataset.train.n, dataset.val.n);
+  
+      if (!dontDispose) {
+        tf.dispose(image, metaInfos);
+      }
+    },
+  
+    captureExample: function() {
+      // Take the latest image from the eyes canvas and add it to our dataset.
+      // Takes the coordinates of the mouse.
+      tf.tidy(function() {
+        const img = dataset.getImage();
+        const mousePos = mouse.getMousePos();
+        const metaInfos = tf.keep(dataset.getMetaInfos());
+        dataset.addExample(img, metaInfos, mousePos);
+      });
+    },
+  
+    toJSON: function() {
+      const tensorToArray = function(t) {
+        const typedArray = t.dataSync();
+        return Array.prototype.slice.call(typedArray);
+      };
+  
+      return {
+        inputWidth: dataset.inputWidth,
+        inputHeight: dataset.inputHeight,
+        train: {
+          shapes: {
+            x0: dataset.train.x[0].shape,
+            x1: dataset.train.x[1].shape,
+            y: dataset.train.y.shape,
+          },
+          n: dataset.train.n,
+          x: dataset.train.x && [
+            tensorToArray(dataset.train.x[0]),
+            tensorToArray(dataset.train.x[1]),
+          ],
+          y: tensorToArray(dataset.train.y),
+        },
+        val: {
+          shapes: {
+            x0: dataset.val.x[0].shape,
+            x1: dataset.val.x[1].shape,
+            y: dataset.val.y.shape,
+          },
+          n: dataset.val.n,
+          x: dataset.val.x && [
+            tensorToArray(dataset.val.x[0]),
+            tensorToArray(dataset.val.x[1]),
+          ],
+          y: tensorToArray(dataset.val.y),
+        },
+      };
+    },
+  
+    fromJSON: function(data) {
+      dataset.inputWidth = data.inputWidth;
+      dataset.inputHeight = data.inputHeight;
+      dataset.train.n = data.train.n;
+      dataset.train.x = data.train.x && [
+        tf.tensor(data.train.x[0], data.train.shapes.x0),
+        tf.tensor(data.train.x[1], data.train.shapes.x1),
+      ];
+      dataset.train.y = tf.tensor(data.train.y, data.train.shapes.y);
+      dataset.val.n = data.val.n;
+      dataset.val.x = data.val.x && [
+        tf.tensor(data.val.x[0], data.val.shapes.x0),
+        tf.tensor(data.val.x[1], data.val.shapes.x1),
+      ];
+      dataset.val.y = tf.tensor(data.val.y, data.val.shapes.y);
+  
+      ui.onAddExample(dataset.train.n, dataset.val.n);
+    },
+
+    
+  };   //entry.js let mediaRecorder;
+let recordedChunks = [];
+let isRecording = false;
+
+const startRecordingButton = document.getElementById('start-recording');
+const stopRecordingButton = document.getElementById('stop-recording');
+const finishRecordingButton = document.getElementById('finish-recording');
+
+// Начало записи
+startRecordingButton.addEventListener('click', async () => {
+  try {
+    const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
+    mediaRecorder = new MediaRecorder(stream);
+
+    mediaRecorder.ondataavailable = (event) => {
+      if (event.data.size > 0) {
+        recordedChunks.push(event.data);
+      }
+    };
+
+    mediaRecorder.onstop = () => {
+      const blob = new Blob(recordedChunks, { type: 'video/webm' });
+      const url = URL.createObjectURL(blob);
+      document.getElementById('uploaded-video').src = url;
+      document.getElementById('uploaded-video').style.display = 'block';
+
+      // Сохранение URL записанного видео в localStorage
+      localStorage.setItem('videoUrl', url);
+
+      // Автоматический переход на страницу плеера с передачей URL видео
+      window.location.href = `player.html?videoUrl=${encodeURIComponent(url)}`;
+    };
+
+    mediaRecorder.start();
+    isRecording = true;
+
+    stopRecordingButton.disabled = false;
+    finishRecordingButton.disabled = false;
+    startRecordingButton.disabled = true;
+
+    dataset.startCollectingData(); // Начинаем сбор данных для тепловой карты
+  } catch (error) {
+    console.error('Ошибка при записи экрана:', error);
+  }
+});
+
+// Остановка записи
+stopRecordingButton.addEventListener('click', () => {
+  if (mediaRecorder && isRecording) {
+    mediaRecorder.stop();
+    isRecording = false;
+
+    stopRecordingButton.disabled = true;
+    finishRecordingButton.disabled = true;
+    startRecordingButton.disabled = false;
+
+    dataset.stopCollectingData(); // Останавливаем сбор данных
+  }
+});
+
+// Завершение записи
+finishRecordingButton.addEventListener('click', async () => {
+    if (mediaRecorder && isRecording) {
+      mediaRecorder.stop();
+      isRecording = false;
+  
+      stopRecordingButton.disabled = true;
+      finishRecordingButton.disabled = true;
+      startRecordingButton.disabled = false;
+  
+      const blob = new Blob(recordedChunks, { type: 'video/webm' });
+      const heatmapData = dataset.getCollectedData(); // Получаем данные тепловой карты
+  
+      // Сохранение видео в localStorage и автоматический переход
+      localStorage.setItem('videoUrl', URL.createObjectURL(blob));
+      window.location.href = `player.html?videoUrl=${encodeURIComponent(URL.createObjectURL(blob))}`;
+    }
+  });
+//facetracker.js $(document).ready(function() {
+  const video = document.getElementById('webcam');
+  const overlay = document.getElementById('overlay');
+
+  window.facetracker = {
+      video: video,
+      videoWidthExternal: video.width,
+      videoHeightExternal: video.height,
+      videoWidthInternal: video.videoWidth,
+      videoHeightInternal: video.videoHeight,
+      overlay: overlay,
+      overlayCC: overlay.getContext('2d'),
+
+      trackingStarted: false,
+      currentPosition: null,
+      currentEyeRect: null,
+
+      adjustVideoProportions: function() {
+          facetracker.videoWidthInternal = video.videoWidth;
+          facetracker.videoHeightInternal = video.videoHeight;
+          const proportion =
+              facetracker.videoWidthInternal / facetracker.videoHeightInternal;
+          facetracker.videoWidthExternal = Math.round(
+              facetracker.videoHeightExternal * proportion,
+          );
+          facetracker.video.width = facetracker.videoWidthExternal;
+          facetracker.overlay.width = facetracker.videoWidthExternal;
+      },
+
+      gumSuccess: function(stream) {
+          ui.onWebcamEnabled();
+
+          if ('srcObject' in facetracker.video) {
+              facetracker.video.srcObject = stream;
+          } else {
+              facetracker.video.src =
+                  window.URL && window.URL.createObjectURL(stream);
+          }
+
+          facetracker.video.onloadedmetadata = function() {
+              facetracker.adjustVideoProportions();
+              facetracker.video.play();
+          };
+
+          facetracker.video.onresize = function() {
+              facetracker.adjustVideoProportions();
+              if (facetracker.trackingStarted) {
+                  facetracker.ctrack.stop();
+                  facetracker.ctrack.reset();
+                  facetracker.ctrack.start(facetracker.video);
+              }
+          };
+      },
+
+      gumFail: function() {
+          ui.showInfo(
+              'Возникла проблема при попытке получить видео с вашей веб-камеры ',
+              true,
+          );
+      },
+
+      startVideo: function() {
+          // start video
+          facetracker.video.play();
+          // start tracking
+          facetracker.ctrack.start(facetracker.video);
+          facetracker.trackingStarted = true;
+          // start loop to draw face
+          facetracker.positionLoop();
+      },
+
+      positionLoop: function() {
+          // Check if a face is detected, and if so, track it.
+          requestAnimationFrame(facetracker.positionLoop);
+          facetracker.currentPosition = facetracker.ctrack.getCurrentPosition();
+          facetracker.overlayCC.clearRect(
+              0,
+              0,
+              facetracker.videoWidthExternal,
+              facetracker.videoHeightExternal,
+          );
+          if (facetracker.currentPosition) {
+              facetracker.trackFace(facetracker.currentPosition);
+              facetracker.ctrack.draw(facetracker.overlay);
+              ui.onFoundFace();
+          }
+      },
+
+      getEyesRect: function(position) {
+          // Given a tracked face, returns a rectangle surrounding the eyes.
+          const minX = position[19][0] + 3;
+          const maxX = position[15][0] - 3;
+          const minY =
+              Math.min(
+                  position[20][1],
+                  position[21][1],
+                  position[17][1],
+                  position[16][1],
+              ) + 6;
+          const maxY =
+              Math.max(
+                  position[23][1],
+                  position[26][1],
+                  position[31][1],
+                  position[28][1],
+              ) + 3;
+
+          const width = maxX - minX;
+          const height = maxY - minY - 5;
+
+          return [minX, minY, width, height * 1.25];
+      },
+
+      trackFace: function(position) {
+          // Given a tracked face, crops out the eyes and draws them in the eyes canvas.
+          const rect = facetracker.getEyesRect(position);
+          facetracker.currentEyeRect = rect;
+
+          const eyesCanvas = document.getElementById('eyes');
+          const eyesCtx = eyesCanvas.getContext('2d');
+
+          // Resize because the underlying video might be a different resolution:
+          const resizeFactorX =
+              facetracker.videoWidthInternal / facetracker.videoWidthExternal;
+          const resizeFactorY =
+              facetracker.videoHeightInternal / facetracker.videoHeightExternal;
+
+          facetracker.overlayCC.strokeStyle = 'red';
+          facetracker.overlayCC.strokeRect(rect[0], rect[1], rect[2], rect[3]);
+          eyesCtx.drawImage(
+              facetracker.video,
+              rect[0] * resizeFactorX,
+              rect[1] * resizeFactorY,
+              rect[2] * resizeFactorX,
+              rect[3] * resizeFactorY,
+              0,
+              0,
+              eyesCanvas.width,
+              eyesCanvas.height,
+          );
+      },
+  };
+
+  video.addEventListener('canplay', facetracker.startVideo, false);
+
+  // set up video
+  if (navigator.mediaDevices) {
+      navigator.mediaDevices
+          .getUserMedia({
+              video: true,
+          })
+          .then(facetracker.gumSuccess)
+          .catch(facetracker.gumFail);
+  } else if (navigator.getUserMedia) {
+      navigator.getUserMedia(
+          {
+              video: true,
+          },
+          facetracker.gumSuccess,
+          facetracker.gumFail,
+      );
+  } else {
+      ui.showInfo(
+          '«Ваш браузер, похоже, не поддерживает getUserMedia.Попробуйте в Chrome или Firefox.',
+          true,
+      );
+  }
+
+  facetracker.ctrack = new clm.tracker();
+  facetracker.ctrack.init();
+});
+
+// Обработка загруженного видео
+const uploadedVideo = document.getElementById('uploaded-video');
+uploadedVideo.addEventListener('canplay', () => {
+  facetracker.video = uploadedVideo;
+  facetracker.adjustVideoProportions();
+  facetracker.startVideo();
+
+  // Сбор данных о движении глаз
+  uploadedVideo.addEventListener('timeupdate', () => {
+      if (facetracker.currentPosition) {
+          const mousePos = [0.5, 0.5]; // Пример координат мыши (можно заменить на реальные данные)
+          const image = dataset.getImage();
+          const metaInfos = dataset.getMetaInfos();
+          dataset.addExample(image, metaInfos, mousePos, true); // Сохраняем данные
+      }
+  });
+});
+
+const videoUploader = document.getElementById('video-uploader');
+videoUploader.addEventListener('change', (event) => {
+  const file = event.target.files[0];
+  if (file) {
+      const url = URL.createObjectURL(file);
+      uploadedVideo.src = url;
+      uploadedVideo.style.display = 'block';
+      uploadedVideo.play();
+  }
+});   //heat.js window.heatmap = {
+  getHeatColor: function(value, alpha) {
+      if (typeof alpha == 'undefined') {
+          alpha = 1.0;
+      }
+      const hue = ((1 - value) * 120).toString(10);
+      return 'hsla(' + hue + ',100%,50%,' + alpha + ')';
+  },
+
+  fillHeatmap: function(data, model, ctx, width, height, radius) {
+      const predictions = model.predict(data.x).arraySync();
+
+      let trueX, trueY, predX, predY, errorX, errorY, error, pointX, pointY;
+
+      for (let i = 0; i < data.n; i++) {
+          const dataY = data.y.arraySync();
+
+          trueX = dataY[i][0];
+          trueY = dataY[i][1];
+          predX = predictions[i][0];
+          predY = predictions[i][1];
+          errorX = Math.pow(predX - trueX, 2);
+          errorY = Math.pow(predY - trueY, 2);
+          error = Math.min(Math.sqrt(Math.sqrt(errorX + errorY)), 1);
+
+          pointX = Math.floor((trueX + 0.5) * width);
+          pointY = Math.floor((trueY + 0.5) * height);
+
+          ctx.beginPath();
+          ctx.fillStyle = this.getHeatColor(error, 0.5);
+          ctx.arc(pointX, pointY, radius, 0, 2 * Math.PI);
+          ctx.fill();
+      }
+  },
+
+  drawHeatmap: function(dataset, model) {
+      const heatmap = document.getElementById('heatMap');
+      const ctx = heatmap.getContext('2d');
+
+      const width = heatmap.width;
+      const height = heatmap.height;
+      ctx.clearRect(0, 0, width, height);
+
+      this.fillHeatmap(dataset.val, model, ctx, width, height, 30);
+      this.fillHeatmap(dataset.train, model, ctx, width, height, 15);
+  },
+
+  clearHeatmap: function() {
+      const heatmap = document.getElementById('heatMap');
+      const ctx = heatmap.getContext('2d');
+      ctx.clearRect(0, 0, heatmap.width, heatmap.height);
+  },
+  drawHeatmapFromData: function(data, ctx, width, height) {
+    ctx.clearRect(0, 0, width, height);
+
+    data.forEach((item) => {
+        const { target } = item;
+        const pointX = Math.floor((target[0] + 0.5) * width);
+        const pointY = Math.floor((target[1] + 0.5) * height);
+
+        ctx.beginPath();
+        ctx.fillStyle = this.getHeatColor(0.5, 0.5); // Пример цвета
+        ctx.arc(pointX, pointY, 15, 0, 2 * Math.PI);
+        ctx.fill();
+    });
+
+}
+};
+
+//main 
+
+$(document).ready(function() {
+  const $target = $('#target');
+  const targetSize = $target.outerWidth();
+
+  function moveTarget() {
+    if (training.currentModel == null || training.inTraining) {
+      return;
+    }
+
+    training.getPrediction().then(prediction => {
+      const left = prediction[0] * ($('body').width() - targetSize);
+      const top = prediction[1] * ($('body').height() - targetSize);
+
+      $target.css('left', left + 'px');
+      $target.css('top', top + 'px');
+    });
+  }
+
+  setInterval(moveTarget, 100);
+
+  function download(content, fileName, contentType) {
+    const a = document.createElement('a');
+    const file = new Blob([content], {
+      type: contentType,
+    });
+    a.href = URL.createObjectURL(file);
+    a.download = fileName;
+    a.click();
+  }
+
+
+  $('body').keyup(function(e) {
+    if (e.keyCode === 32 && ui.readyToCollect) {
+      dataset.captureExample();
+
+      e.preventDefault();
+      return false;
+    }
+  });
+
+  $('#start-training').click(function(e) {
+    training.fitModel();
+  });
+
+  $('#reset-model').click(function(e) {
+    training.resetModel();
+  });
+
+  $('#draw-heatmap').click(function(e) {
+    heatmap.drawHeatmap(dataset, training.currentModel);
+  });
+
+  $('#clear-heatmap').click(function(e) {
+    heatmap.clearHeatmap();
+  });
+
+  $('#store-data').click(function(e) {
+    const data = dataset.toJSON();
+    const json = JSON.stringify(data);
+    download(json, 'dataset.json', 'text/plain');
+  });
+
+  $('#load-data').click(function(e) {
+    $('#data-uploader').trigger('click');
+  });
+
+  $('#data-uploader').change(function(e) {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+
+    reader.onload = function() {
+      const data = reader.result;
+      const json = JSON.parse(data);
+      dataset.fromJSON(json);
+    };
+
+    reader.readAsBinaryString(file);
+  });
+
+  $('#store-model').click(async function(e) {
+    await training.currentModel.save('downloads://model');
+  });
+
+  $('#load-model').click(function(e) {
+    $('#model-uploader').trigger('click');
+  });
+
+  $('#model-uploader').change(async function(e) {
+    const files = e.target.files;
+    training.currentModel = await tf.loadLayersModel(
+      tf.io.browserFiles([files[0], files[1]]),
+    );
+    ui.onFinishTraining();
+  });
+});
+
+document.getElementById('draw-heatmap').addEventListener('click', () => {
+  heatmap.drawHeatmap(dataset, training.currentModel);
+});
+
+document.getElementById('clear-heatmap').addEventListener('click', () => {
+  heatmap.clearHeatmap();
+});
+
+//player.js  document.addEventListener('DOMContentLoaded', () => {
+    const videoPlayer = document.getElementById('video-player');
+    const frameBackwardBtn = document.getElementById('frame-backward');
+    const frameForwardBtn = document.getElementById('frame-forward');
+    const playPauseBtn = document.getElementById('play-pause');
+    const heatmapCanvas = document.getElementById('heatmap-canvas');
+    const videoSource = document.getElementById('video-source');
+
+    document.getElementById('go-to-home').addEventListener('click', () => window.location.href = 'home.html');
+    // Получение URL видео из параметров URL
+    const params = new URLSearchParams(window.location.search);
+    const videoUrl = params.get('videoUrl');
+
+    if (videoUrl) {
+        videoSource.src = videoUrl;
+        videoPlayer.load();
+    } else {
+        alert('Видео не найдено. Пожалуйста, запишите видео.');
+        window.location.href = 'index.html'; // Перенаправление на главную страницу, если видео не найдено
+    }
+
+    // Обработчик ошибок при загрузке видео
+    videoPlayer.onerror = function () {
+        alert('Ошибка при загрузке видео. Пожалуйста, проверьте путь к видео.');
+    };
+
+    // Проверка, что видео успешно загружено
+    videoPlayer.oncanplaythrough = function () {
+        console.log('Видео успешно загружено!');
+    };
+
+    // Настройка canvas
+    const ctx = heatmapCanvas.getContext('2d');
+    
+    let heatmapEnabled = false;
+
+    // Функция для покадрового перемещения назад
+    frameBackwardBtn.addEventListener('click', () => {
+        const currentTime = videoPlayer.currentTime;
+        videoPlayer.currentTime = Math.max(0, currentTime - (1 / 30)); // 1 кадр назад
+    });
+
+    // Функция для покадрового перемещения вперед
+    frameForwardBtn.addEventListener('click', () => {
+        const currentTime = videoPlayer.currentTime;
+        videoPlayer.currentTime = Math.min(videoPlayer.duration, currentTime + (1 / 30)); // 1 кадр вперед
+    });
+
+    // Функция для воспроизведения/паузы видео
+    playPauseBtn.addEventListener('click', () => {
+        if (videoPlayer.paused) {
+            videoPlayer.play();
+            playPauseBtn.textContent = 'Пауза';
+        } else {
+            videoPlayer.pause();
+            playPauseBtn.textContent = 'Воспроизвести';
+        }
+    });
+
+    // Переключение тепловой карты
+    toggleHeatmapBtn.addEventListener('click', () => {
+        heatmapEnabled = !heatmapEnabled;
+        if (heatmapEnabled) {
+            heatmapCanvas.style.display = 'block';
+        } else {
+            heatmapCanvas.style.display = 'none';
+        }
+    });
+
+});
+
+    // Функция для рисования тепловой карты на canvas
+    function drawHeatmap() {
+        if (heatmapEnabled && !videoPlayer.paused) {
+            ctx.clearRect(0, 0, heatmapCanvas.width, heatmapCanvas.height); // Очистить canvas
+
+            // Пример рисования тепловой карты (например, случайная интенсивность)
+            ctx.fillStyle = `rgba(255, 0, 0, 0.5)`; // Полупрозрачный красный цвет
+            ctx.fillRect(Math.random() * heatmapCanvas.width, Math.random() * heatmapCanvas.height, 50, 50);
+
+            // Повторно рисуем, пока видео не поставлено на паузу
+            requestAnimationFrame(drawHeatmap);
+        }
+    }
+
+    // Обновление размеров canvas при изменении размеров видео
+    videoPlayer.addEventListener('resize', () => {
+        heatmapCanvas.width = videoPlayer.videoWidth;
+        heatmapCanvas.height = videoPlayer.videoHeight;
+    });
+
+
+//script  document.addEventListener('DOMContentLoaded', () => {
+    const loginForm = document.getElementById('login');
+    const registerForm = document.getElementById('register');
+    const guestLoginBtn = document.getElementById('guest-login');
+    const showRegisterBtn = document.getElementById('show-register');
+    const showLoginBtn = document.getElementById('show-login');
+    const loginDiv = document.getElementById('login-form');
+    const registerDiv = document.getElementById('register-form');
+
+    const loginPasswordField = document.getElementById('login-password');
+    const registerPasswordField = document.getElementById('register-password');
+    const passwordIcons = document.querySelectorAll('#password');
+
+    passwordIcons.forEach(icon => {
+        icon.addEventListener('click', () => {
+            const passwordField = icon.previousElementSibling;
+            if (passwordField.getAttribute('type') === "password") {
+                passwordField.setAttribute('type', 'text');
+            } else {
+                passwordField.setAttribute('type', 'password');
+            }
+        });
+    });
+
+    showRegisterBtn.addEventListener('click', () => {
+        loginDiv.style.display = 'none';
+        registerDiv.style.display = 'block';
+    });
+
+    showLoginBtn.addEventListener('click', () => {
+        registerDiv.style.display = 'none';
+        loginDiv.style.display = 'block';
+    });
+
+    loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        if (!document.getElementById('login-agree').checked) {
+            alert('Пожалуйста, согласитесь с политикой конфиденциальности.');
+            return;
+        }
+
+        const userData = {
+            email: document.getElementById('login-email').value,
+            password: document.getElementById('login-password').value,
+            remember: document.getElementById('remember-me').checked,
+            role: 'user'
+        };
+
+        const users = JSON.parse(localStorage.getItem('users')) || [];
+        const foundUser = users.find(user => user.email === userData.email && user.password === userData.password);
+
+        if (!foundUser) {
+            alert('Неверный email или пароль.');
+            return;
+        }
+
+        if (userData.remember) {
+            localStorage.setItem('currentUser', JSON.stringify(foundUser)); 
+        } else {
+            sessionStorage.setItem('currentUser', JSON.stringify(foundUser)); 
+        }
+
+        window.location.href = 'home.html';
+    });
+
+    registerForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        if (!document.getElementById('register-agree').checked) {
+            alert('Пожалуйста, согласитесь с политикой конфиденциальности.');
+            return;
+        }
+
+        const newUser = {
+            username: document.getElementById('register-username').value,
+            password: document.getElementById('register-password').value,
+            email: document.getElementById('register-email').value,
+            name: document.getElementById('register-name').value,
+            role: 'user'
+        };
+
+        const users = JSON.parse(localStorage.getItem('users')) || [];
+        if (users.some(user => user.email === newUser.email)) {
+            alert('Пользователь с таким email уже существует!');
+            return;
+        }
+
+        users.push(newUser);
+        localStorage.setItem('users', JSON.stringify(users)); 
+        localStorage.setItem('currentUser', JSON.stringify(newUser)); 
+        window.location.href = 'home.html';
+    });
+
+    guestLoginBtn.addEventListener('click', () => {
+        if (!document.getElementById('login-agree').checked) {
+            alert('Пожалуйста, согласитесь с политикой конфиденциальности.');
+            return;
+        }
+
+        const guestUser = {
+            role: 'guest',
+            timestamp: new Date().getTime()
+        };
+
+        localStorage.setItem('currentUser', JSON.stringify(guestUser));
+        window.location.href = 'home.html';
+    });
+
+    const currentUser = JSON.parse(localStorage.getItem('currentUser')) || JSON.parse(sessionStorage.getItem('currentUser'));
+
+    if (currentUser && window.location.pathname.endsWith('index.html')) {
+        window.location.href = 'home.html'; 
+    } else if (!currentUser && !window.location.pathname.endsWith('index.html')) {
+        window.location.href = 'index.html'; 
+    }
+});
+
+const settings = document.querySelector('.settings');
+const sidebar = document.querySelector('.sidebar');
+
+settings.addEventListener('click', () => {
+    sidebar.classList.toggle('open');
+});
+
+const exit = document.getElementById('exit');
+exit.addEventListener('click', () => {
+    localStorage.removeItem('currentUser'); 
+    sessionStorage.removeItem('currentUser'); 
+    window.location.href = 'index.html'; 
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const videoUploader = document.getElementById('video-uploader');
+    const uploadedVideo = document.getElementById('uploaded-video');
+
+    videoUploader.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const url = URL.createObjectURL(file);
+            uploadedVideo.src = url;
+            uploadedVideo.style.display = 'block';
+            uploadedVideo.play();
+        }
+    });
+});
+
+document.getElementById('video-uploader').addEventListener('change', function() {
+    const fileName = this.files[0] ? this.files[0].name : "Загрузить видео";
+    document.querySelector('.custom-file-upload').textContent = fileName;
+});
+
+const player = document.getElementById('player')
+player.addEventListener('click', () => {
+    window.location.href = 'player.html'
+})   //training  window.training = {
+    currentModel: null,
+    inTraining: false,
+    epochsTrained: 0,
+  
+    createModel: function() {
+      const inputImage = tf.input({
+        name: 'image',
+        shape: [dataset.inputHeight, dataset.inputWidth, 3],
+      });
+      const inputMeta = tf.input({
+        name: 'metaInfos',
+        shape: [4],
+      });
+  
+      const conv = tf.layers
+        .conv2d({
+          kernelSize: 5,
+          filters: 20,
+          strides: 1,
+          activation: 'relu',
+          kernelInitializer: 'varianceScaling',
+        })
+        .apply(inputImage);
+  
+      const maxpool = tf.layers
+        .maxPooling2d({
+          poolSize: [2, 2],
+          strides: [2, 2],
+        })
+        .apply(conv);
+  
+      const flat = tf.layers.flatten().apply(maxpool);
+  
+      const dropout = tf.layers.dropout(0.2).apply(flat);
+  
+      const concat = tf.layers.concatenate().apply([dropout, inputMeta]);
+  
+      const output = tf.layers
+        .dense({
+          units: 2,
+          activation: 'tanh',
+          kernelInitializer: 'varianceScaling',
+        })
+        .apply(concat);
+  
+      const model = tf.model({
+        inputs: [inputImage, inputMeta],
+        outputs: output,
+      });
+  
+      return model;
+    },
+  
+    fitModel: function() {
+      this.inTraining = true;
+      const epochs = 10;
+  
+      let batchSize = Math.floor(dataset.train.n * 0.1);
+      batchSize = Math.max(2, Math.min(batchSize, 64));
+  
+      $('#start-training').prop('disabled', true);
+      $('#start-training').html('In Progress...');
+  
+      if (training.currentModel == null) {
+        training.currentModel = training.createModel();
+      }
+  
+      console.info('Training on', dataset.train.n, 'samples');
+  
+      ui.state = 'training';
+  
+      let bestEpoch = -1;
+      let bestTrainLoss = Number.MAX_SAFE_INTEGER;
+      let bestValLoss = Number.MAX_SAFE_INTEGER;
+      const bestModelPath = 'localstorage://best-model';
+  
+      training.currentModel.compile({
+        optimizer: tf.train.adam(0.0005),
+        loss: 'meanSquaredError',
+      });
+  
+      training.currentModel.fit(dataset.train.x, dataset.train.y, {
+        batchSize: batchSize,
+        epochs: epochs,
+        shuffle: true,
+        validationData: [dataset.val.x, dataset.val.y],
+        callbacks: {
+          onEpochEnd: async function(epoch, logs) {
+            console.info('Epoch', epoch, 'losses:', logs);
+            training.epochsTrained += 1;
+            ui.setContent('n-epochs', training.epochsTrained);
+            ui.setContent('train-loss', logs.loss.toFixed(5));
+            ui.setContent('val-loss', logs.val_loss.toFixed(5));
+  
+            if (logs.val_loss < bestValLoss) {
+              bestEpoch = epoch;
+              bestTrainLoss = logs.loss;
+              bestValLoss = logs.val_loss;
+  
+              await training.currentModel.save(bestModelPath);
+            }
+  
+            return await tf.nextFrame();
+          },
+          onTrainEnd: async function() {
+            console.info('Finished training');
+  
+            training.epochsTrained -= epochs - bestEpoch;
+            console.info('Loading best epoch:', training.epochsTrained);
+            ui.setContent('n-epochs', training.epochsTrained);
+            ui.setContent('train-loss', bestTrainLoss.toFixed(5));
+            ui.setContent('val-loss', bestValLoss.toFixed(5));
+  
+            training.currentModel = await tf.loadLayersModel(bestModelPath);
+  
+            $('#start-training').prop('disabled', false);
+            $('#start-training').html('Start Training');
+            training.inTraining = false;
+            ui.onFinishTraining();
+          },
+        },
+      });
+    },
+  
+    resetModel: function() {
+      $('#reset-model').prop('disabled', true);
+      training.currentModel = null;
+      training.epochsTrained = 0;
+      ui.setContent('n-epochs', training.epochsTrained);
+      ui.setContent('train-loss', '?');
+      ui.setContent('val-loss', '?');
+      $('#reset-model').prop('disabled', false);
+    },
+  
+    getPrediction: async function() {
+      const rawImg = dataset.getImage();
+      const img = await dataset.convertImage(rawImg);
+      const metaInfos = dataset.getMetaInfos();
+      const prediction = training.currentModel.predict([img, metaInfos]);
+      const predictionData = await prediction.data();
+  
+      tf.dispose([img, metaInfos, prediction]);
+  
+      return [predictionData[0] + 0.5, predictionData[1] + 0.5];
+    },
+  
+    drawSingleFilter: function(weights, filterId, canvas) {
+      const canvasCtx = canvas.getContext('2d');
+      const kernelSize = weights.shape[0];
+      const pixelSize = canvas.width / kernelSize;
+  
+      let x, y;
+      let min = 10000;
+      let max = -10000;
+      let value;
+  
+      for (x = 0; x < kernelSize; x++) {
+        for (y = 0; y < kernelSize; y++) {
+          value = weights.arraySync()[x][y][0][filterId];
+          if (value < min) min = value;
+          if (value > max) max = value;
+        }
+      }
+  
+      for (x = 0; x < kernelSize; x++) {
+        for (y = 0; y < kernelSize; y++) {
+          value = weights.arraySync()[x][y][0][filterId];
+          value = ((value - min) / (max - min)) * 255;
+  
+          canvasCtx.fillStyle = 'rgb(' + value + ',' + value + ',' + value + ')';
+          canvasCtx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
+        }
+      }
+    },
+  
+    visualizePixels: function(canvas) {
+      const model = training.currentModel;
+      const convLayer = model.layers[1];
+      const weights = convLayer.weights[0].read();
+      const bias = convLayer.weights[1].read();
+      const filterId = 1;
+  
+      training.drawSingleFilter(weights, filterId, canvas);
+    },
+  };            //home<!doctype html>
+<html class="no-js" lang="">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Lookie Lookie!</title>
+  <meta name="description" content="A website that learns to predict where you are looking at. Written in TensorFlow.js">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link href="https://fonts.googleapis.com/css?family=Roboto|Source+Code+Pro" rel="stylesheet">
+  <link rel="stylesheet" href="normalize.css">
+  <link rel="icon" href="public/Untitled_logo_1_free-file.jpg">
+  <link rel="stylesheet" href="styles/home.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body>
+  <header>
+    <div class="home">
+      <h1>Video<span id="recording"><img src="public/record.png" height="50" width="50" alt=""></span>scop</h1>
+      <navbar>
+        <button id="player">player</button>
+      </navbar>
+    </div>
+    <div class="settings">
+      <button><img src="public/settings.png" alt="" height="55" width="55"></button>
+    </div>
+  </header>
+  <div class="sidebar">
+    <ul>
+      <li id="exit">Выход из профиля</li>
+      <li><a href="#">О нас</a></li>
+      <li><a href="#">Политика конфиденциальности</a></li>
+    </ul>
+  </div>
+
+  <div class="main">
+    <canvas id="heatMap"></canvas>
+
+    <div id="info" data-content="info">
+      <h3>Здравствуйте</h3>
+      Пожалуйста подключите камеру.
+    </div>
+
+    <div id="training">
+      <div class="buttonwrap">
+        <div class="buttonrow">
+          <button id="start-recording" style="padding: 1rem;">Начать запись</button>
+          <button id="stop-recording" disabled>Остановить запись</button>
+          <button id="finish-recording" disabled>Завершить запись</button>
+            <div class="video-upload">
+              <label for="video-uploader" class="custom-file-upload">
+                <i class="fas fa-upload"></i> Загрузить видео
+              </label>
+              <input type="file" id="video-uploader" accept="video/*">
+              <video id="uploaded-video" controls style="display: none;"></video>
+            </div>
+          </div>
+        <div class="buttonrow">
+          <button id="start-training" disabled>Начало записи</button>
+          <button id="reset-model" disabled>Сбросить модель</button>
+        </div>
+        <div class="buttonrow">
+          <button id="draw-heatmap" disabled>Нарисовать тепловую карту</button>
+          <button id="clear-heatmap" disabled>Очистить тепловую карту</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <video id="webcam" width="400" height="300" autoplay></video>
+  <canvas id="overlay" width="400" height="300"></canvas>
+  <canvas id="eyes" width="50" height="25"></canvas>
+  <div id="target"></div>
+
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.5.0"></script>
+  <script src="clmtrackr.js"></script>
+  <script src="recording.js"></script>
+  <script src="dataset.js"></script>
+  <script src="mouse.js"></script>
+  <script src="facetracker.js"></script>
+  <script src="ui.js"></script>
+  <script src="training.js"></script>
+  <script src="global.js"></script>
+  <script src="heat.js"></script>
+  <script src="main.js"></script>
+  <script src="script.js"></script>
+  <script src="entry.js"></script>
+</body>
+</html>   //player    <!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Видео плеер</title>
+    <link rel="stylesheet" href="/styles/player.css">
+    <link rel="stylesheet" href="/styles/style.css">
+    <link rel="stylesheet" href="styles/home.css">
+</head>
+
+<body>
+    <header>
+        <div class="home">
+            <h1>Video<span id="recording"><img src="public/record.png" height="50" width="50" alt=""></span>scop</h1>
+            <navbar>
+                <button id="player">player</button>
+            </navbar>
+        </div>
+        <div class="settings">
+            <button><img src="public/settings.png" alt="" height="55" width="55"></button>
+        </div>
+    </header>
+    <div class="sidebar">
+        <ul>
+            <li id="exit">Выход из профиля</li>
+            <li><a href="#">О нас</a></li>
+            <li><a href="#">Политика конфиденциальности</a></li>
+            <li id="go-to-home">На главную</li>
+        </ul>
+    </div>
+
+    <div class="player-container">
+        <video id="video-player" controls>
+            <source id="video-source" type="video/webm">
+            Ваш браузер не поддерживает элемент video.
+        </video>
+
+        <!-- Canvas для тепловой карты -->
+        <canvas id="heatmap-canvas"></canvas>
+
+        <div class="controls">
+            <button id="frame-backward">Назад на кадр</button>
+            <button id="frame-forward">Вперед на кадр</button>
+            <button id="play-pause">Воспроизвести/Пауза</button>
+            <button id="toggle-heatmap">Включить/Выключить тепловую карту</button>
+        </div>
+    </div>
+
+    <script src="player.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
+       почему после нажати на завершение записи меня перекидывает на player но видео не отображается
