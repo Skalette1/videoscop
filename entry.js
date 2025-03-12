@@ -6,7 +6,7 @@ const startRecordingButton = document.getElementById('start-recording');
 const stopRecordingButton = document.getElementById('stop-recording');
 const finishRecordingButton = document.getElementById('finish-recording');
 
-// Функция для открытия IndexedDB
+
 function openDB() {
     return new Promise((resolve, reject) => {
         const request = indexedDB.open("VideoDB", 1);
@@ -21,7 +21,7 @@ function openDB() {
     });
 }
 
-// Функция для сохранения видео в IndexedDB
+
 async function saveVideoToDB(blob) {
     const db = await openDB();
     const transaction = db.transaction("videos", "readwrite");
@@ -29,7 +29,6 @@ async function saveVideoToDB(blob) {
     store.put({ id: "recordedVideo", blob });
 }
 
-// Начало записи
 startRecordingButton.addEventListener('click', async () => {
     try {
         const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
@@ -43,9 +42,8 @@ startRecordingButton.addEventListener('click', async () => {
 
         mediaRecorder.onstop = async () => {
             const blob = new Blob(recordedChunks, { type: 'video/webm' });
-            await saveVideoToDB(blob); // Сохраняем видео в IndexedDB
+            await saveVideoToDB(blob); 
 
-            // Переход на страницу плеера
             window.location.href = 'player.html';
         };
 
@@ -56,7 +54,7 @@ startRecordingButton.addEventListener('click', async () => {
         finishRecordingButton.disabled = false;
         startRecordingButton.disabled = true;
 
-        dataset.startCollectingData(); // Начинаем сбор данных для тепловой карты
+        dataset.startCollectingData(); 
     } catch (error) {
         console.error('Ошибка при записи экрана:', error);
     }
@@ -72,11 +70,11 @@ stopRecordingButton.addEventListener('click', () => {
         finishRecordingButton.disabled = true;
         startRecordingButton.disabled = false;
 
-        dataset.stopCollectingData(); // Останавливаем сбор данных
+        dataset.stopCollectingData(); 
     }
 });
 
-// Завершение записи
+
 finishRecordingButton.addEventListener('click', async () => {
     if (mediaRecorder && isRecording) {
         mediaRecorder.stop();
@@ -87,9 +85,9 @@ finishRecordingButton.addEventListener('click', async () => {
         startRecordingButton.disabled = false;
 
         const blob = new Blob(recordedChunks, { type: 'video/webm' });
-        await saveVideoToDB(blob); // Сохраняем видео в IndexedDB
+        await saveVideoToDB(blob); 
 
-        // Переход на страницу плеера
+  
         window.location.href = 'player.html';
     }
 });

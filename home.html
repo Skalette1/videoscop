@@ -80,7 +80,7 @@
   <script src="recording.js"></script>
   <script src="dataset.js"></script>
   <script src="mouse.js"></script>
-  <!-- <script src="facetracker.js"></script> -->
+  <script src="facetracker.js"></script>
   <script src="ui.js"></script>
   <script src="training.js"></script>
   <script src="global.js"></script>
@@ -89,7 +89,7 @@
   <script src="script.js"></script>
 
 
-  <script>
+  <script>7
     let mediaRecorder;
     let recordedChunks = [];
     let isRecording = false;
@@ -98,7 +98,7 @@
     const stopRecordingButton = document.getElementById('stop-recording');
     const finishRecordingButton = document.getElementById('finish-recording');
   
-    // Начало записи
+
     startRecordingButton.addEventListener('click', async () => {
       try {
         const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
@@ -112,15 +112,13 @@
   
         mediaRecorder.onstop = () => {
           const blob = new Blob(recordedChunks, { type: 'video/webm' });
-          
-          // Сохранение Blob-объекта в localStorage как строку (Base64)
+  
           const reader = new FileReader();
           reader.onloadend = () => {
-            localStorage.setItem('videoBlob', reader.result); // Сохраняем в localStorage
+            localStorage.setItem('videoBlob', reader.result); 
           };
-          reader.readAsDataURL(blob); // Преобразуем Blob в строку Base64
+          reader.readAsDataURL(blob);
   
-          // Переход на страницу плеера
           window.location.href = 'player.html';
         };
   
@@ -135,7 +133,6 @@
       }
     });
   
-    // Остановка записи
     stopRecordingButton.addEventListener('click', () => {
       if (mediaRecorder && isRecording) {
         mediaRecorder.stop();
@@ -147,7 +144,6 @@
       }
     });
   
-    // Завершение записи
     finishRecordingButton.addEventListener('click', async () => {
       if (mediaRecorder && isRecording) {
         mediaRecorder.stop();
@@ -159,15 +155,13 @@
   
         const blob = new Blob(recordedChunks, { type: 'video/webm' });
   
-        // Сохранение Blob-объекта в localStorage как строку (Base64)
         const reader = new FileReader();
         reader.onloadend = () => {
-          localStorage.setItem('videoBlob', reader.result); // Сохраняем в localStorage
+          localStorage.setItem('videoBlob', reader.result); 
         };
-        reader.readAsDataURL(blob); // Преобразуем Blob в строку Base64
+        reader.readAsDataURL(blob);
   
-        // Переход на страницу плеера
-        window.location.href = 'player.html';
+                window.location.href = 'player.html';
       }
     });
   </script>

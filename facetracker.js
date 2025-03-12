@@ -170,20 +170,18 @@ $(document).ready(function() {
   facetracker.ctrack.init();
 });
 
-// Обработка загруженного видео
 const uploadedVideo = document.getElementById('uploaded-video');
 uploadedVideo.addEventListener('canplay', () => {
   facetracker.video = uploadedVideo;
   facetracker.adjustVideoProportions();
   facetracker.startVideo();
 
-  // Сбор данных о движении глаз
   uploadedVideo.addEventListener('timeupdate', () => {
       if (facetracker.currentPosition) {
-          const mousePos = [0.5, 0.5]; // Пример координат мыши (можно заменить на реальные данные)
+          const mousePos = [0.5, 0.5]; 
           const image = dataset.getImage();
           const metaInfos = dataset.getMetaInfos();
-          dataset.addExample(image, metaInfos, mousePos, true); // Сохраняем данные
+          dataset.addExample(image, metaInfos, mousePos, true); 
       }
   });
 });

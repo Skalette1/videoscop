@@ -59,7 +59,7 @@ window.heatmap = {
         const pointY = Math.floor((target[1] + 0.5) * height);
 
         ctx.beginPath();
-        ctx.fillStyle = this.getHeatColor(0.5, 0.5); // Пример цвета
+        ctx.fillStyle = this.getHeatColor(0.5, 0.5);
         ctx.arc(pointX, pointY, 15, 0, 2 * Math.PI);
         ctx.fill();
     });

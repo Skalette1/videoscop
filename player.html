@@ -37,7 +37,6 @@
             Ваш браузер не поддерживает элемент video.
         </video>
 
-        <!-- Canvas для тепловой карты -->
         <canvas id="heatmap-canvas"></canvas>
 
         <div class="controls">
@@ -58,8 +57,7 @@
           const toggleHeatmapButton = document.getElementById('toggle-heatmap');
       
           let isHeatmapVisible = false;
-      
-          // Загружаем видео из localStorage
+
           const videoData = localStorage.getItem('videoBlob');
           if (videoData) {
             const videoBlob = dataURLToBlob(videoData);
@@ -70,39 +68,38 @@
             alert('Видео не найдено!');
           }
       
-          // Управление воспроизведением видео
+
           playPauseButton.addEventListener('click', () => {
             if (videoPlayer.paused) {
               videoPlayer.play();
-              playPauseButton.textContent = 'Пауза'; // Изменяем текст на кнопке
+              playPauseButton.textContent = 'Пауза'; 
             } else {
               videoPlayer.pause();
-              playPauseButton.textContent = 'Воспроизвести'; // Изменяем текст на кнопке
+              playPauseButton.textContent = 'Воспроизвести'; 
             }
           });
-      
-          // Перемещение на один кадр назад
+
           frameBackwardButton.addEventListener('click', () => {
-            videoPlayer.currentTime = Math.max(0, videoPlayer.currentTime - 0.04); // Перемещаем назад на 1/25 секунды
+            videoPlayer.currentTime = Math.max(0, videoPlayer.currentTime - 0.04); 
           });
       
-          // Перемещение на один кадр вперед
+
           frameForwardButton.addEventListener('click', () => {
-            videoPlayer.currentTime = Math.min(videoPlayer.duration, videoPlayer.currentTime + 0.04); // Перемещаем вперед на 1/25 секунды
+            videoPlayer.currentTime = Math.min(videoPlayer.duration, videoPlayer.currentTime + 0.04);
           });
       
-          // Переключение тепловой карты
+    
           toggleHeatmapButton.addEventListener('click', () => {
             isHeatmapVisible = !isHeatmapVisible;
             if (isHeatmapVisible) {
-              heatmapCanvas.style.display = 'block'; // Показываем тепловую карту
+              heatmapCanvas.style.display = 'block'; 
             } else {
-              heatmapCanvas.style.display = 'none'; // Скрываем тепловую карту
+              heatmapCanvas.style.display = 'none'; 
             }
           });
         });
       
-        // Функция для преобразования строки Base64 в Blob
+  
         function dataURLToBlob(dataURL) {
           const byteString = atob(dataURL.split(',')[1]);
           const arrayBuffer = new ArrayBuffer(byteString.length);
