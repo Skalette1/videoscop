@@ -1,52 +1,88 @@
+:root {
+  --main-backgroundColor: #1D1E27;
+  --auth-background: #262934;
+  --main-color: #FAFAFA;
+  --active: #E8162E;
+  --font-size: 20px;
+}
+
 body {
     font-family: Arial, sans-serif;
-    background: #1D1E27;
+    font-size: var(--font-size);
+    background: var(--main-backgroundColor);
     color: #fff;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
     margin: 0;
+    font-family: "Wix Madefor Display", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
   }
-  
-  :root {
-    --main-backgroundColor: #1D1E27;
-    --main-color: #FAFAFA;
-    --active: #E8162E;
-}
+
+  .progress {
+    display: flex;
+    position: fixed;
+    top: 20px;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #fff -40%, red);
+  }
 
   .container {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--auth-background);
     padding: 2rem;
     border-radius: 15px;
     backdrop-filter: blur(10px);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
     width: 100%;
-    max-width: 400px;
+    max-width: 565px;
+    text-align: center;
+  }
+
+  #login {
+    border-bottom: 1px solid #FAFAFA;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+  }
+
+  form {
     text-align: center;
   }
   
   .auth-form h2 {
     margin-bottom: 1.5rem;
-    font-size: 2rem;
-    color: #fff;
+    font-size: 1.6rem;
+    font-weight: 500;
+    color: #FAFAFA;
+  }
+
+  .sign-up-container {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
   }
   
   .auth-form input {
     width: 100%;
     padding: 0.75rem;
-    margin: 0.5rem 0;
+    margin: 0.5rem auto;
     border: none;
     border-radius: 8px;
-    background: rgba(255, 255, 255, 0.2);
-    color: #fff;
+    background: #FAFAFA;
+    color: #000;
     font-size: 1rem;
     outline: none;
   }
   
   .auth-form input::placeholder {
-    color: rgba(255, 255, 255, 0.7);
-  }
+    color: #1D1E27 !important;
+    font-size: 1.1rem;
+    opacity: 1; 
+}
   
   .auth-form button {
     width: 100%;
@@ -54,7 +90,7 @@ body {
     margin: 1rem 0;
     border: none;
     border-radius: 8px;
-    background: #ff6f61;
+    background: var(--active);
     color: #fff;
     font-size: 1rem;
     cursor: grab;
@@ -62,7 +98,11 @@ body {
   }
   
   .auth-form button:hover {
-    background: #ff4a3d;
+    background: #b10a1e;
+  }
+
+  a {
+    transition: .4s all ease-in-out;
   }
   
   .privacy-policy {
@@ -75,8 +115,6 @@ body {
   .privacy-policy input {
     display: flex;
   }
-
-  
   
   .privacy-policy a {
     color: #ff6f61;
@@ -85,11 +123,6 @@ body {
   
   .privacy-policy a:hover {
     text-decoration: underline;
-  }
-
-  a {
-    color: var(--main-color);
-    text-decoration: none;
   }
 
   .privacy-policy input[type='checkbox'] {
@@ -134,3 +167,169 @@ body {
   .privacy-policy input[type="checkbox"] {
     margin-right: 0.5rem;
   }
+
+  .policy {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    margin: 0;
+    padding: 0;
+    font-size: 1.15rem;
+}
+
+.policy a {
+    display: inline;
+    margin: 0 5px;
+    color: #E8162E;
+}
+
+.remember {
+  display: flex;
+  align-items: center !important;
+}
+
+.remember-label {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: center !important;
+  gap: -1rem;
+}
+
+.login-btn,
+.signup-btn {
+  color: var(--main-backgroundColor) !important;
+  background-color:  var(--main-color) !important;
+  border-radius: 1.6rem !important;
+  margin: .6rem auto !important;
+  padding: .6rem .95rem  ;
+  width: 40% !important;
+  font-size: 1.2rem !important;
+}
+
+.login-btn:hover,
+.signup-btn:hover {
+  color: var(--main-color) !important;
+  background-color: var(--active) !important;
+} 
+
+#forgot {
+  display: block;
+  color: #FAFAFA;
+  font-size: 1.1rem;
+  text-decoration: none;
+}
+
+#dont-have-acc {
+  margin-top: 2rem !important;
+  margin: 5rem !important;
+}
+
+#guest-login {
+  color: var(--main-color);
+  margin-left: 0.2rem;
+}
+
+#forgot:hover {
+  transform: scale(1.1);
+  text-decoration: underline;
+}
+
+#guest-login:hover {
+  transform: scale(1.1) !important;
+  text-decoration: underline;
+}
+
+@media(max-width: 490px) {
+  .policy {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+/* Медиа-запросы для экранов меньше 768px */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+    max-width: 90%;
+  }
+
+  .auth-form h2 {
+    font-size: 1.4rem;
+  }
+
+  .auth-form input {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .auth-form button {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+    width: 50% !important;
+  }
+
+  .login-btn,
+  .signup-btn {
+    width: 60% !important;
+  }
+
+  .policy {
+    font-size: 1rem;
+  }
+
+
+  #forgot {
+    font-size: 1rem;
+  }
+
+  #guest-login {
+    font-size: 1rem;
+  }
+}
+
+/* Медиа-запросы для экранов меньше 490px */
+@media (max-width: 490px) {
+  .container {
+    padding: 0.5rem;
+    max-width: 95%;
+  }
+
+  .auth-form h2 {
+    font-size: 1.2rem;
+  }
+
+  .auth-form input {
+    padding: 0.4rem;
+    font-size: 0.8rem;
+  }
+
+  .auth-form button {
+    padding: 0.4rem;
+    font-size: 0.8rem;
+    width: 70% !important;
+  }
+
+  .login-btn,
+  .signup-btn {
+    width: 80% !important;
+  }
+
+  .policy {
+    font-size: 0.9rem;
+    flex-direction: column;
+  }
+
+  .remember-label {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #forgot {
+    font-size: 0.9rem;
+  }
+
+  #guest-login {
+    font-size: 0.9rem;
+  }
+}

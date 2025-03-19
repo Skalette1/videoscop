@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const showLoginBtn = document.getElementById('show-login');
     const loginDiv = document.getElementById('login-form');
     const registerDiv = document.getElementById('register-form');
+    const startTraining  = document.getElementById('start-training')
 
     const loginPasswordField = document.getElementById('login-password');
     const registerPasswordField = document.getElementById('register-password');
@@ -116,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-const settings = document.querySelector('.settings');
+const settings = document.querySelector('#settings-btn');
 const sidebar = document.querySelector('.sidebar');
 
 settings.addEventListener('click', () => {
@@ -129,7 +130,6 @@ exit.addEventListener('click', () => {
     sessionStorage.removeItem('currentUser'); 
     window.location.href = 'index.html'; 
 });
-
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -149,6 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
 document.getElementById('video-uploader').addEventListener('change', function() {
     const fileName = this.files[0] ? this.files[0].name : "Загрузить видео";
     document.querySelector('.custom-file-upload').textContent = fileName;
@@ -158,3 +159,8 @@ const player = document.getElementById('player')
 player.addEventListener('click', () => {
     window.location.href = 'player.html'
 })
+
+startTraining.addEventListener('click', () => {
+    videoUploader.style.display = 'none'
+})
+
