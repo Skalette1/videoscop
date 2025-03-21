@@ -1,7 +1,7 @@
 body, html {
     width: 100%;
     height: 100vh;
-    overflow: hidden;
+    /* overflow-x: hidden; */
     font-family: "Wix Madefor Display", sans-serif;
     color: rgba(0, 0, 0, 0.8);
     background-color: var(--main-backgroundColor);
@@ -20,7 +20,7 @@ body, html {
   top: 20px;
   width: 100%;
   height: 4px;
-  background: linear-gradient(90deg, #fff 20%, red);
+  background: linear-gradient(to right, white 10%, #E8162E 110%);
 }
 
 header {
@@ -62,9 +62,15 @@ h1 {
   transition: .6s all ease-in-out;
 }
 
+.settings {
+  position: relative;
+  z-index: 1000;
+}
+
 #settings-btn {
   display: flex;
   background-color: transparent !important;
+  z-index: .9;
 }
 
 .settings button img:hover {
@@ -74,82 +80,126 @@ h1 {
 }
 
 .sidebar {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
   position: fixed;
   right: -500px;
-  height: 100%;
+  height: 100vh;
   width: 330px;
+  top: 0; 
   border: 2px inset var(--main-color);
   border-right: none;
   border-radius: 2rem .3rem;
+  padding: 2rem;
   margin: 0;
   padding-top: 1rem;
   z-index: 1000;
-  background: linear-gradient(30deg, #E8162E 5%, 43%, #1D1E27 100%);;
-  box-shadow: 1px 1px 1px 2px var(--main-color);
+  background: #E8162E;
+  /* box-shadow: 1px 1px 10px 20px var(--main-color); */
   font-size: 1.1rem;
-  font-weight: bold;
-  font-family: 'Times New Roman', Times, serif;
-  transition: .8s all ease-in-out;
+  transition: right 0.8s ease-in-out; 
 }
 
 .sidebar.open {
   right: 0;
 }
 
-.sidebar ul  {
+.sidebar ul {
   color: var(--main-color);
   list-style: none;
   display: flex;
   flex-direction: column;
+  flex: 1;
   gap: 1.3rem;
+  width: 100%;
+  padding: 0;
 }
 
 .sidebar ul li {
+  font-size: 1.3rem;
+  font-weight: 500;
   cursor: pointer;
   transition: .4s all ease-in-out;
+}
+
+.remove-sidebar {
+  all: unset;
+  width: 35px;
+  height: 36px;
+  cursor: pointer;
+  margin-bottom: 1rem;
+}
+
+.sidebar-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.2rem;
+  width: 100%;
+  margin-top: auto;
+  margin-bottom: 2rem;
+  justify-content: flex-end;
+  padding: 1rem auto;
+  list-style: none;
+}
+
+.sidebar-footer li {
+  color: var(--main-color);
+  font-size: 1.3rem;
+  font-weight: 500;
+  transition: .4s all ease-in-out;
+}
+
+.hide-eye {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.hide-eye input {
+  transform: scale(1.6);
+  accent-color: #000;
+}
+
+.sidebar ul li:hover,
+.sidebar-footer li:hover {
+  transform: scale(1.1);
+  text-decoration: underline;
 }
 
   #webcam, #overlay {
     display: flex;
     justify-content: center;
     align-items: center !important;
-    margin: 5rem auto;
-    height: 50%;
+    margin: 0rem auto;
     border-radius: 5.5rem !important;
-
   }
   
-  #webcam {
-    border-radius: 1.2rem;
-  }
-
   #eyes {
     position: absolute;
-    top: 10%;
+    top: 150px;
     left: 300px;
     border-radius: .7rem;
+    opacity: 0;
   }
   
   #target {
     background-color: var(--active);
     position: absolute;
+    top: 18rem;
+    right: 40%;
     border-radius: 50%;
     height: 40px;
     width: 40px;
     transition: all 0.1s ease;
-    box-shadow: 0 0 20px 10px white;
-    border: 4px solid rgba(0,0,0,0.5);
-    opacity: 0;
+    opacity: 1;
   }
     
   a {
     color: var(--main-color);
     text-decoration: none;
-  }
-
-  .sidebar ul li:hover {
-    transform: scale(1.1);
-    text-decoration: underline;
   }
 
   #info {
@@ -179,10 +229,6 @@ h1 {
   #info.flash {
     -webkit-animation-name: flash;
     animation-name: flash;
-  }
-  
-  #training {
-    
   }
   
   #training td {
@@ -230,41 +276,60 @@ h1 {
   }
 
 .webcam-container {
-  position: relative; 
-  width: 400px; 
-  height: 300px; 
-  margin-top: 20px;
+  position: relative;
+  width: 100%;
+  max-width: 750px;
+  height: 480px;
+  border-radius: 24px;
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.2);
+  background: #262934;
+  margin: 5rem 0;
+  overflow: hidden;
+  transition: all 0.3s ease;
 }
 
-#webcam,
-#uploaded-video {
-  width: 100%; 
-  height: 100%; 
-  object-fit: cover;
-  border-radius: 10px; 
-  position: absolute; 
+
+#webcam, #uploaded-video, #overlay {
+  position: absolute;
   top: 0;
   left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; 
+  transition: opacity 0.3s ease;
 }
 
-#uploaded-video {
-  display: none; 
+.video-upload {
+  position: absolute;
+  bottom: 20px; 
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: block;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 10px;
+  border-radius: 8px;
 }
+
 
 #overlay {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%; 
-  height: 100%; 
-  pointer-events: none; 
+  height: 100%;
+  pointer-events: none;
+  background-color: rgba(0, 0, 0, 0.4);
+  border-radius: .5rem !important;
+  max-width: 100%;
+  min-height: 350px;
+  object-fit: cover;
+  margin: 0;
+  z-index: 5;
 }
 
-.video-upload {
-  position: absolute;
-  bottom: -50px; 
-  left: 50%;
-  transform: translateX(-50%);
+#video-uploader {
+  display: none;
 }
 
   .main {
@@ -300,10 +365,6 @@ h1 {
     transition: .6s all ease-in-out;
   }
 
-  #video-uploader {
-    display: none;
-}
-
 .custom-file-upload {
     display: inline-block;
     position: relative;
@@ -333,6 +394,7 @@ h1 {
   
 .video-upload {
   display: inline;
+  z-index: 100;
 }
 
 .buttonrow {
@@ -342,7 +404,38 @@ h1 {
   justify-content: center;
 }
 
+.buttons-for-overlay {
+  display: flex;
+  flex-direction: column ;
+  align-items: center;
+}
 
+.video-upload {
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  transform: translateY(10px);
+  display: block; /* Убедитесь, что элемент отображается */
+}
+
+.video-upload.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+#webcam,
+#uploaded-video {
+  transition: opacity 0.3s ease;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+#uploaded-video {
+  display: none;
+  z-index: 2;
+}
 @keyframes pulse {
   0% {
       transform: scale(1);
@@ -390,3 +483,31 @@ h1 {
     }
   }
   
+  
+  @media(max-width: 650px) {
+    .main {
+      flex-direction: column-reverse;
+      justify-content: center;
+      align-items: center
+    }
+
+    .header-text-content {
+      display: flex;
+      flex-direction: column;
+    }
+  }
+
+  @media(max-width: 370px) {
+    .settings {
+      margin-right: 4rem !important;
+      transform: translateX(-3rem);
+    }
+
+    header {
+      width: 100vw !important;
+    }
+
+    .main {
+      width: 140% !important;
+    }
+  }

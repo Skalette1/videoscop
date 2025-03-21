@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Видео плеер</title>
+    <title>Sessions</title>
     <link rel="stylesheet" href="styles/player.css">
     <link rel="stylesheet" href="styles/style.css">
     <link rel="stylesheet" href="styles/home.css">
 </head>
 
 <body>
-    <div class="progress"></div>
+    <div class="progress-player" style="background-color: #E8162E;"></div>
     <header>
       <div class="header-text-content">
-        <h1>Video<span id="recording"><img src="public/record.png" height="50" width="50" alt=""></span>scop</h1>
+        <h1 style="color: #E8162E;">VIDEO<span id="recording"><img src="public/record.png" height="50" width="50" alt=""></span>SCOP</h1>
         <navbar>
-          <button id="player" style="color: #E8162E;">SESSIONS</button>
+          <button id="player">SESSIONS</button>
         </navbar>
       </div>
     <div class="settings">
@@ -23,30 +23,55 @@
     </div>
   </header>
 
-    <div class="sidebar" style="transform: translateY(20%);">
+    <div class="sidebar">
         <ul>
-            <li id="exit">Выход из профиля</li>
-            <li><a href="#">О нас</a></li>
-            <li><a href="#">Политика конфиденциальности</a></li>
-            <li id="go-to-home">На главную</li>
+          <button class="remove-sidebar" src="public/ARROW.svg">
+            <svg 
+      class="custom-icon" 
+      version="1.1" 
+      id="Capa_1" 
+      xmlns="http://www.w3.org/2000/svg" 
+      xmlns:xlink="http://www.w3.org/1999/xlink" 
+      x="0px" 
+      y="0px" 
+      viewBox="0 0 477.175 477.175" 
+      style="enable-background:new 0 0 477.175 477.175;" 
+      xml:space="preserve"
+    >
+      <g>
+        <path 
+          style="fill: #fff;" 
+          d="M360.731,229.075l-225.1-225.1c-5.3-5.3-13.8-5.3-19.1,0s-5.3,13.8,0,19.1l215.5,215.5l-215.5,215.5c-5.3,5.3-5.3,13.8,0,19.1c2.6,2.6,6.1,4,9.5,4c3.4,0,6.9-1.3,9.5-4l225.1-225.1C365.931,242.875,365.931,234.275,360.731,229.075z"
+        ></path>
+      </g>
+    </svg>
+          </button>
+            <li id="exit">LOGOUT FROM PROFILE</li>
+            <li id="back-on-main"><a href="#">BACK ON MAIN</a></li>
+            <div class="sidebar-footer">
+              <li><a href="#">CONTACTS</a></li>
+              <li><a href="#">POLITICS</a></li>
+              <li><a href="#">ABOUT US</a></li>
+            </div>
         </ul>
     </div>
 
     <div class="player-container">
         <video id="video-player" controls>
             <source id="video-source" type="video/webm">
-            Ваш браузер не поддерживает элемент video.
+            YOUR BROWSER DOES NOT SUPPORT THE VIDEO ELEMENT.
         </video>
 
         <canvas id="heatmap-canvas"></canvas>
 
         <div class="controls">
-            <button id="frame-backward">Назад на кадр</button>
-            <button id="frame-forward">Вперед на кадр</button>
-            <button id="play-pause">Воспроизвести/Пауза</button>
-            <button id="toggle-heatmap">Включить/Выключить тепловую карту</button>
+            <button id="frame-backward">FRAME BACK</button>
+            <button id="frame-forward">FRAME FORWARD</button>
+            <button id="play-pause">PLAY/PAUSE</button>
+            <button id="toggle-heatmap">DRAW / RESET HEAT MAP</button>
         </div>
     </div>
+    <script src="script.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
           const videoPlayer = document.getElementById('video-player');
@@ -112,9 +137,12 @@
       
           return new Blob([uintArray], { type: 'video/webm' });
         }
+
+        const toHome = document.querySelector('#back-on-main')
+        toHome.addEventListener('click', () => {
+          window.location.href = 'home.html'
+        })
       </script>
-      
-      
 
 </body>
 </html>

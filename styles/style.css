@@ -27,7 +27,7 @@ body {
     top: 20px;
     width: 100%;
     height: 4px;
-    background: linear-gradient(90deg, #fff -40%, red);
+    background: linear-gradient(to right, white 10%, #E8162E 20%);
   }
 
   .container {
@@ -247,7 +247,6 @@ body {
   }
 }
 
-/* Медиа-запросы для экранов меньше 768px */
 @media (max-width: 768px) {
   .container {
     padding: 1rem;
@@ -288,7 +287,6 @@ body {
   }
 }
 
-/* Медиа-запросы для экранов меньше 490px */
 @media (max-width: 490px) {
   .container {
     padding: 0.5rem;
@@ -331,5 +329,10 @@ body {
 
   #guest-login {
     font-size: 0.9rem;
+  }
+
+  .privacy-policy {
+    display: flex;
+    flex-direction: column;
   }
 }

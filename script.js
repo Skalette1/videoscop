@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const registerDiv = document.getElementById('register-form');
     const startTraining  = document.getElementById('start-training')
 
+    //авторизация
     const loginPasswordField = document.getElementById('login-password');
     const registerPasswordField = document.getElementById('register-password');
     const passwordIcons = document.querySelectorAll('#password');
@@ -117,13 +118,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-const settings = document.querySelector('#settings-btn');
-const sidebar = document.querySelector('.sidebar');
 
-settings.addEventListener('click', () => {
-    sidebar.classList.toggle('open');
+
+//sidebar
+
+
+const sidebar = document.querySelector('.sidebar');
+const settingsBtn = document.getElementById('settings-btn')
+const removeSidebar = document.querySelector(".remove-sidebar")
+settingsBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('open')
 });
 
+removeSidebar.addEventListener('click',() => {
+   sidebar.classList.remove('open')
+})
+
+
+
+//выход из профиля
 const exit = document.getElementById('exit');
 exit.addEventListener('click', () => {
     localStorage.removeItem('currentUser'); 
@@ -132,6 +145,8 @@ exit.addEventListener('click', () => {
 });
 
 
+
+//блок с загрузкой видео
 document.addEventListener('DOMContentLoaded', () => {
     const videoUploader = document.getElementById('video-uploader');
     if (videoUploader) {
@@ -163,4 +178,5 @@ player.addEventListener('click', () => {
 startTraining.addEventListener('click', () => {
     videoUploader.style.display = 'none'
 })
+
 
