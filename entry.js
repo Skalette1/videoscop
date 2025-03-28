@@ -34,13 +34,17 @@ startRecordingButton.addEventListener('click', async () => {
     mediaRecorder.start();
     isRecording = true;
 
+    setTimeout(() => {
+      recording.style.display = 'inline-block'
+  }, 2000);
+
     stopRecordingButton.disabled = false;
     finishRecordingButton.disabled = false;
     startRecordingButton.disabled = true;
   } catch (error) {
     console.error('Ошибка при записи экрана:', error);
   }
-});
+}, {once: true});
 
 stopRecordingButton.addEventListener('click', () => {
   if (mediaRecorder && isRecording) {
@@ -69,7 +73,18 @@ finishRecordingButton.addEventListener('click', async () => {
       localStorage.setItem('videoBlob', reader.result); 
     };
     reader.readAsDataURL(blob);
-
-            window.location.href = 'player.html';
+    
+      window.location.href = 'player.html';
   }
 });
+
+//Значок записи
+const recording = document.querySelector('#recording')
+const beginTrain = document.querySelector('#start-training')
+const endTrain = document.querySelector('#reset-model')
+
+
+endTrain.addEventListener('click', () => {
+    recording.style.display = 'none'
+})
+

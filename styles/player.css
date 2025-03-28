@@ -26,28 +26,99 @@ body, html {
   background: linear-gradient(90deg, #fff 70%, red);
 }
 
-
 header {
-  display: flex;
-  align-items: flex-start !important;
-  justify-content: space-between !important;
-  gap: 3rem;
-  width: 100vw;
-  margin-top: 1.2rem;
-  position: fixed;
-  top: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2rem;
+    position: fixed !important;
+    top: .5rem;
+    width: 100%;
+    box-sizing: border-box;
 }
+
+.left, .center, .right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+header, .left, .center, .right, .search input, .search, .loupe {
+    position: relative;
+    z-index: 100;
+}
+
+.search input {
+    color: #fff;
+    font-size: 1.1rem;
+    padding: 1rem 1.5rem;
+    background-color: transparent;
+    border: none;
+    width: 0px;
+    border-radius: .5rem;
+    transition: .5s all ease-in-out;
+    position: relative;
+    left: auto; 
+    right: 0; 
+    transform-origin: right;
+}
+
+.search:hover input {
+    border: 1px solid #fafafa;
+    width: 205px;
+}
+
+.loupe {
+    cursor: pointer;
+    fill: #f0f0f0;
+    width: 40px;
+    height: 50px;
+}
+
+#settings-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.search input::placeholder {
+    color: #fff;
+    font-family: "Wix Madefor Display", sans-serif;
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+.settings {
+    position: relative;
+    z-index: 1000;
+  }
+  
+  #settings-btn {
+    display: flex;
+    transform: translateX(20px);
+    background-color: transparent !important;
+    z-index: .9;
+  }
+  
+  .settings button img:hover {
+    transition: .9s all ease-in-out;
+    transform: rotate(360deg);
+    background-color: transparent;
+  }
 
 video {
     max-width: 50%;
     height: auto;
     margin-bottom: 20px;
+    border: .7rem solid #262934;
+    box-shadow: 0 2px 8px rgb(45, 48, 62);
 }
 
 .player-container {
     text-align: center;
     display: flex;
     align-items: center;
+    margin: 0 auto !important;
 }
 
 .controls {
@@ -63,7 +134,6 @@ video {
     cursor: pointer;
   }
   
-
 button {
     cursor: pointer;
     border: none;
@@ -75,14 +145,13 @@ button {
     font-weight: bold;
     padding: 0.7em;
     margin: 0.3em;
-    width: 140px;
     font-family: 'Source Code Pro', monospace;
     transition: .4s all ease-in-out;
     border-radius: 5px;
 }
 
 button:hover {
-    background-color: var(#E8162E);
+    background-color: var(--active);
 }
 
 .home {
@@ -104,6 +173,7 @@ button:hover {
 #video-player {
     width: 100% !important;
     height: auto;
+    margin-top: 5rem;
 }
 
 #heatmap-canvas {
@@ -128,5 +198,103 @@ button:hover {
     padding: 10px;
 }
 
-@media(max-width: 650px) {
+.controls-button {
+    display: flex;
+    align-items: center;
+    background-color: #f0f0f0;
+    cursor: pointer;
+    border: none;
+    z-index: 11;
+    cursor: pointer;
+    border-radius: 1.2rem;
+    border: none;
+    font-size: 10pt;
+    font-weight: bold;
+    margin: 0.3em;
+    width: max-content;
+    font-family: 'Source Code Pro', monospace;
+    transition: .4s all ease-in-out;
+}
+
+.controls-button img {
+    transform: rotate(180deg);
+}
+
+.controls-button button {
+    font-size: 1rem;
+    padding: 0.6em .8rem;
+    border-radius: .8rem;
+    white-space: nowrap;
+}
+
+.controls button:hover {
+    color: var(--main-color);
+    background-color: var(--active);
+}
+
+@media(max-width: 925px) {
+    .left h1 {
+        display: none;
+    }
+    
+    #player {
+        font-size: 2rem !important;
+    }
+
+    #settings-btn img {
+        transform: scale(.88);
+    }
+}
+
+@media(max-width: 768px) {
+    header {
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+
+    .center {
+        order: 3;
+        width: 100%;
+        justify-content: left;
+        margin: -.5rem 5rem 1rem 0 !important;
+        transform: translate(-3.3rem, -1rem);
+    }
+
+    .search  {
+        width: 300px;
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: .8rem;
+        margin-left: 2rem !important;
+    }
+
+    /* .search input {
+        pointer-events: none;
+    } */
+
+    .search:active input {
+        border: none;
+        width: 205px;
+    }
+}
+
+@media(max-width: 410px) {
+    header {
+        flex-wrap: nowrap;
+    }
+
+    .search {
+        position: fixed;
+        top: 8rem;
+    }
+
+    #settings-btn img {
+        transform: scale(.76);
+    }
+
+    .search {
+        position: fixed;
+        top: 8rem;
+        left: 2rem; 
+        right: 0;
+    }
 }

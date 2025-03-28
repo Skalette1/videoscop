@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sessions</title>
+    <link rel="icon" href="public/Untitled_logo_1_free-file.jpg">
     <link rel="stylesheet" href="styles/player.css">
     <link rel="stylesheet" href="styles/style.css">
     <link rel="stylesheet" href="styles/home.css">
@@ -12,17 +13,23 @@
 <body>
     <div class="progress-player" style="background-color: #E8162E;"></div>
     <header>
-      <div class="header-text-content">
-        <h1 style="color: #E8162E;">VIDEO<span id="recording"><img src="public/record.png" height="50" width="50" alt=""></span>SCOP</h1>
-        <navbar>
+      <div class="left">
+          <h1 style="color: #E8162E;">VIDEO<span id="recording"><img src="public/record.png" height="50" width="50" alt="recording"></span>SCOP</h1>
           <button id="player">SESSIONS</button>
-        </navbar>
       </div>
-    <div class="settings">
-      <button style="background-color: transparent;" id="settings-btn"><img src="public/settings.svg" alt="settings" id="settings-img" height="55" width="55"></button>
-    </div>
+      
+      <div class="center search">
+          <input type="search" placeholder="Search...">
+          <svg class="loupe" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 451 451" style="enable-background:new 0 0 451 451;" xml:space="preserve">
+            <g><path d="M447.05,428l-109.6-109.6c29.4-33.8,47.2-77.9,47.2-126.1C384.65,86.2,298.35,0,192.35,0C86.25,0,0.05,86.3,0.05,192.3 s86.3,192.3,192.3,192.3c48.2,0,92.3-17.8,126.1-47.2L428.05,447c2.6,2.6,6.1,4,9.5,4s6.9-1.3,9.5-4 C452.25,441.8,452.25,433.2,447.05,428z M26.95,192.3c0-91.2,74.2-165.3,165.3-165.3c91.2,0,165.3,74.2,165.3,165.3 s-74.1,165.4-165.3,165.4C101.15,357.7,26.95,283.5,26.95,192.3z">
+            </path></g></svg>
+      </div>
+      
+      <div class="right settings">
+          <button id="settings-btn"><img src="public/settings.svg" alt="settings" height="55" width="55"></button>
+      </div>
   </header>
-
+  
     <div class="sidebar">
         <ul>
           <button class="remove-sidebar" src="public/ARROW.svg">
@@ -65,15 +72,21 @@
         <canvas id="heatmap-canvas"></canvas>
 
         <div class="controls">
-            <button id="frame-backward">FRAME BACK</button>
-            <button id="frame-forward">FRAME FORWARD</button>
+          <div class="controls-button">
+          <img src="/public/ARROW2.svg" alt="" height="30" width="30"> <button id="frame-backward">FRAME BACK</button>
+          </div>
             <button id="play-pause">PLAY/PAUSE</button>
             <button id="toggle-heatmap">DRAW / RESET HEAT MAP</button>
+            <div class="controls-button">
+             <button id="frame-forward">FRAME FORWARD</button> <img src="/public/ARROW2.svg" alt="" height="30" width="30" style="transform: rotate(0);">
+            </div>
         </div>
     </div>
     <script src="script.js"></script>
+    <script src="heat.js"></script>
+    <script src="main.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+      document.addEventListener('DOMContentLoaded', () => {
           const videoPlayer = document.getElementById('video-player');
           const heatmapCanvas = document.getElementById('heatmap-canvas');
           const ctx = heatmapCanvas.getContext('2d');
@@ -83,66 +96,115 @@
           const toggleHeatmapButton = document.getElementById('toggle-heatmap');
       
           let isHeatmapVisible = false;
-
+      
+          // Пример загрузки данных и модели
+          let dataset = [];  // Здесь загружаются данные для тепловой карты
+          let training = { currentModel: null };  // Здесь загружается модель
+      
+          // Подключаем видеоплеер
           const videoData = localStorage.getItem('videoBlob');
           if (videoData) {
-            const videoBlob = dataURLToBlob(videoData);
-            const videoSource = document.getElementById('video-source');
-            videoSource.src = URL.createObjectURL(videoBlob);
-            videoPlayer.load();
+              const videoBlob = dataURLToBlob(videoData);
+              const videoSource = document.getElementById('video-source');
+              videoSource.src = URL.createObjectURL(videoBlob);
+              videoPlayer.load();
           } else {
-            alert('Видео не найдено!');
+              alert('Видео не найдено!');
           }
       
-
+          // Переключение воспроизведения видео
           playPauseButton.addEventListener('click', () => {
-            if (videoPlayer.paused) {
-              videoPlayer.play();
-              playPauseButton.textContent = 'Пауза'; 
-            } else {
-              videoPlayer.pause();
-              playPauseButton.textContent = 'Воспроизвести'; 
-            }
+              if (videoPlayer.paused) {
+                  videoPlayer.play();
+                  playPauseButton.textContent = 'Пауза';
+              } else {
+                  videoPlayer.pause();
+                  playPauseButton.textContent = 'Воспроизвести';
+              }
           });
-
+      
+          // Перемотка видео на 1 кадр назад
           frameBackwardButton.addEventListener('click', () => {
-            videoPlayer.currentTime = Math.max(0, videoPlayer.currentTime - 0.04); 
+              videoPlayer.currentTime = Math.max(0, videoPlayer.currentTime - 0.04);
           });
       
-
+          // Перемотка видео на 1 кадр вперед
           frameForwardButton.addEventListener('click', () => {
-            videoPlayer.currentTime = Math.min(videoPlayer.duration, videoPlayer.currentTime + 0.04);
+              videoPlayer.currentTime = Math.min(videoPlayer.duration, videoPlayer.currentTime + 0.04);
           });
       
-    
+          // Переключение тепловой карты
           toggleHeatmapButton.addEventListener('click', () => {
-            isHeatmapVisible = !isHeatmapVisible;
-            if (isHeatmapVisible) {
-              heatmapCanvas.style.display = 'block'; 
-            } else {
-              heatmapCanvas.style.display = 'none'; 
-            }
+              isHeatmapVisible = !isHeatmapVisible;
+      
+              if (isHeatmapVisible) {
+                  // Проверка модели и данных
+                  if (!training?.currentModel) {
+                      alert('Модель не загружена или не обучена!');
+                      isHeatmapVisible = false;
+                      return;
+                  }
+      
+                  if (dataset.length === 0) {
+                      alert('Данные не загружены!');
+                      isHeatmapVisible = false;
+                      return;
+                  }
+      
+                  heatmapCanvas.style.display = 'block';
+                  resizeCanvas();
+                  drawHeatmapOverlay();
+              } else {
+                  heatmapCanvas.style.display = 'none';
+                  clearHeatmap();
+              }
           });
-        });
       
-  
-        function dataURLToBlob(dataURL) {
-          const byteString = atob(dataURL.split(',')[1]);
-          const arrayBuffer = new ArrayBuffer(byteString.length);
-          const uintArray = new Uint8Array(arrayBuffer);
-      
-          for (let i = 0; i < byteString.length; i++) {
-            uintArray[i] = byteString.charCodeAt(i);
+          // Функция для подгонки canvas под размер видео
+          function resizeCanvas() {
+              heatmapCanvas.width = videoPlayer.clientWidth;
+              heatmapCanvas.height = videoPlayer.clientHeight;
           }
       
-          return new Blob([uintArray], { type: 'video/webm' });
-        }
-
-        const toHome = document.querySelector('#back-on-main')
-        toHome.addEventListener('click', () => {
-          window.location.href = 'home.html'
-        })
+          // Функция для рисования тепловой карты
+          function drawHeatmapOverlay() {
+              if (!ctx) {
+                  console.error('Не удалось получить контекст для canvas');
+                  return;
+              }
+      
+              ctx.clearRect(0, 0, heatmapCanvas.width, heatmapCanvas.height);
+      
+              // Пример рисования тепловой карты
+              // Здесь ты должен использовать свою модель и данные для рисования
+              // Например:
+              dataset.forEach((point) => {
+                  ctx.beginPath();
+                  ctx.arc(point.x, point.y, point.intensity, 0, Math.PI * 2);
+                  ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
+                  ctx.fill();
+              });
+          }
+      
+          // Очистка тепловой карты
+          function clearHeatmap() {
+              ctx.clearRect(0, 0, heatmapCanvas.width, heatmapCanvas.height);
+          }
+      
+          // Функция для преобразования base64 в Blob
+          function dataURLToBlob(dataURL) {
+              const byteString = atob(dataURL.split(',')[1]);
+              const arrayBuffer = new ArrayBuffer(byteString.length);
+              const uintArray = new Uint8Array(arrayBuffer);
+      
+              for (let i = 0; i < byteString.length; i++) {
+                  uintArray[i] = byteString.charCodeAt(i);
+              }
+      
+              return new Blob([uintArray], { type: 'video/webm' });
+          }
+      });
       </script>
-
+      
 </body>
 </html>
