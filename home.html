@@ -25,12 +25,47 @@
       <button style="background-color: transparent;" id="settings-btn"><img src="public/settings.svg" alt="settings" id="settings-img" height="55" width="55"></button>
     </div>
   </header>
+  <div class="loading-indicator">
+    <div class="loading-spinner"></div>
+  </div>
+  <div class="sidebar">
+    <button class="remove-sidebar">
+      <svg 
+        class="custom-icon" 
+        version="1.1" 
+        id="Capa_1" 
+        xmlns="http://www.w3.org/2000/svg" 
+        xmlns:xlink="http://www.w3.org/1999/xlink" 
+        x="0px" 
+        y="0px" 
+        viewBox="0 0 477.175 477.175" 
+        style="enable-background:new 0 0 477.175 477.175;" 
+        xml:space="preserve"
+      >
+        <g>
+          <path 
+            style="fill: #fff;" 
+            d="M360.731,229.075l-225.1-225.1c-5.3-5.3-13.8-5.3-19.1,0s-5.3,13.8,0,19.1l215.5,215.5l-215.5,215.5c-5.3,5.3-5.3,13.8,0,19.1c2.6,2.6,6.1,4,9.5,4c3.4,0,6.9-1.3,9.5-4l225.1-225.1C365.931,242.875,365.931,234.275,360.731,229.075z"
+          ></path>
+        </g>
+      </svg>
+    </button>
   
-  <div class="main">
-    <div class="webcam-container">
-      <video id="webcam" width="400" height="300" autoplay></video>
-      <canvas id="overlay" width="400" height="300" style="opacity: 0;"></canvas>
+    <ul>
+      <li id="exit">CHANGE PROFILE</li>
+      <li class="hide-eye"><a href="#">HIDE VIEW DOT</a><input type="checkbox" name="" id="hide-eye-checkbox"></li>
+      <li><a href="#">RESTART MODEL</a></li>
+    </ul>
+  
+    <div class="sidebar-footer">
+      <li><a href="#">CONTACTS</a></li>
+      <li><a href="#">POLITICS</a></li>
+      <li><a href="#">ABOUT US</a></li>
     </div>
+  </div>
+
+  <div class="main">
+    <canvas id="heatMap"></canvas>
 
     <div id="training">
       <div class="buttonwrap">
@@ -44,89 +79,55 @@
       </div>
     </div>
 
-    <div class="video-upload">
-      <label for="video-uploader" class="custom-file-upload">
-        <i class="fas fa-upload"></i> DOWNLOAD VIDEO
-      </label>
-      <input type="file" id="video-uploader" accept="video/*">
+    <div class="webcam-container">
+      <video id="webcam" width="400" height="300" autoplay></video>
+      <video id="uploaded-video" controls style="display: none;"></video>
+      <canvas id="overlay" width="400" height="300" style="opacity: 0;"></canvas>
+      <div class="video-upload">
+        <label for="video-uploader" class="custom-file-upload">
+          <i class="fas fa-upload"></i> DOWNLOAD VIDEO
+        </label>
+        <input type="file" id="video-uploader" accept="video/*">
+      </div>
     </div>
   </div>
 
+  <canvas id="eyes" width="50" height="25"></canvas>
+  <div id="target"></div>
+
   <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.5.0"></script>
+  <script src="clmtrackr.js"></script>
   <script src="recording.js"></script>
+  <script src="dataset.js"></script>
+  <script src="mouse.js"></script>
+  <script src="facetracker.js"></script>
   <script src="ui.js"></script>
+  <script src="training.js"></script>
+  <script src="global.js"></script>
+  <script src="heat.js"></script>
+  <script src="main.js"></script>
+  <script src="entry.js"></script>
+  <script src="script.js"></script>
   <script>
-    let mediaRecorder;
-    let recordedChunks = [];
-    let isRecording = false;
+document.addEventListener('DOMContentLoaded', () => {
+  const target = document.getElementById('target');
+  const hideEyeCheckbox = document.getElementById('hide-eye-checkbox');
+  const videoUpload = document.querySelector('.video-upload');
+  const videoInput = document.getElementById('video-uploader');
+  const uploadedVideo = document.getElementById('uploaded-video');
+  const webcam = document.getElementById('webcam');
 
-    const startRecordingButton = document.querySelector('.start-recording');
-    const stopRecordingButton = document.getElementById('stop-recording');
-    const finishRecordingButton = document.getElementById('finish-recording');
+  const updateEyeVisibility = () => {
+    target.style.opacity = hideEyeCheckbox.checked ? '0' : '1';
+  };
+  hideEyeCheckbox.addEventListener('change', updateEyeVisibility);
+  updateEyeVisibility();
 
-    startRecordingButton.addEventListener('click', async () => {
-      try {
-        const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
-        mediaRecorder = new MediaRecorder(stream);
+})
 
-        mediaRecorder.ondataavailable = (event) => {
-          if (event.data.size > 0) {
-            recordedChunks.push(event.data);
-          }
-        };
 
-        mediaRecorder.onstop = () => {
-          const blob = new Blob(recordedChunks, { type: 'video/webm' });
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            localStorage.setItem('videoBlob', reader.result);
-          };
-          reader.readAsDataURL(blob);
-          window.location.href = 'player.html';
-        };
-
-        mediaRecorder.start();
-        isRecording = true;
-
-        stopRecordingButton.disabled = false;
-        finishRecordingButton.disabled = false;
-        startRecordingButton.disabled = true;
-      } catch (error) {
-        console.error('Ошибка при записи экрана:', error);
-      }
-    }, { once: true });
-
-    stopRecordingButton.addEventListener('click', () => {
-      if (mediaRecorder && isRecording) {
-        mediaRecorder.stop();
-        isRecording = false;
-
-        stopRecordingButton.disabled = true;
-        finishRecordingButton.disabled = true;
-        startRecordingButton.disabled = false;
-      }
-    });
-
-    finishRecordingButton.addEventListener('click', () => {
-      if (mediaRecorder && isRecording) {
-        mediaRecorder.stop();
-        isRecording = false;
-
-        stopRecordingButton.disabled = true;
-        finishRecordingButton.disabled = true;
-        startRecordingButton.disabled = false;
-
-        const blob = new Blob(recordedChunks, { type: 'video/webm' });
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          localStorage.setItem('videoBlob', reader.result);
-        };
-        reader.readAsDataURL(blob);
-        
-        window.location.href = 'player.html';
-      }
-    });
   </script>
 </body>
 </html>
+
