@@ -1,133 +1,193 @@
 <!doctype html>
 <html lang="ru">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
-  <title>Videoscop</title>
-  <meta name="description" content="A website that learns to predict where you are looking at. Written in TensorFlow.js">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <link href="https://fonts.googleapis.com/css?family=Roboto|Source+Code+Pro" rel="stylesheet">
-  <link rel="icon" href="public/Untitled_logo_1_free-file.jpg">
-  <link rel="stylesheet" href="styles/home.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-</head>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <title>Videoscop</title>
+    <meta
+      name="description"
+      content="A website that learns to predict where you are looking at. Written in TensorFlow.js"
+    />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto|Source+Code+Pro"
+      rel="stylesheet"
+    />
+    <link rel="icon" href="public/Untitled_logo_1_free-file.jpg" />
+    <link rel="stylesheet" href="styles/home.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+    href="https://fonts.googleapis.com/css2?family=Wix+Madefor+Display:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />  
+  </head>
 
-<body>
-  <div class="progress"></div>
-  <header>
-    <div class="header-text-content">
-      <h1>Video<span id="recording"><img src="public/record.png" height="50" width="50" alt=""></span>scop</h1>
-      <navbar>
-        <button id="player" style="color: #E8162E; cursor: pointer;">SESSIONS</button>
-      </navbar>
-    </div>  
-    <div class="settings">
-      <button style="background-color: transparent;" id="settings-btn"><img src="public/settings.svg" alt="settings" id="settings-img" height="55" width="55"></button>
+  <body>
+    <div class="progress"></div>
+    <header>
+      <div class="header-text-content">
+        <h1>
+          VIDEO<span id="recording"
+            ><img src="public/record.png" height="50" width="50" alt="" /></span
+          >SCOP
+        </h1>
+        <navbar>
+          <button id="player" style="color: #e8162e; cursor: pointer;   font-family: 'Wix Madefor Display', sans-serif;">
+            SESSIONS
+          </button>
+        </navbar>
+      </div>
+      <div class="settings">
+        <button style="background-color: transparent" id="settings-btn">
+          <img
+            src="public/settings.svg"
+            alt="settings"
+            id="settings-img"
+            height="55"
+            width="55"
+          />
+        </button>
+      </div>
+    </header>
+    <div class="loading-indicator">
+      <div class="loading-spinner"></div>
     </div>
-  </header>
-  <div class="loading-indicator">
-    <div class="loading-spinner"></div>
-  </div>
-  <div class="sidebar">
-    <button class="remove-sidebar">
-      <svg 
-        class="custom-icon" 
-        version="1.1" 
-        id="Capa_1" 
-        xmlns="http://www.w3.org/2000/svg" 
-        xmlns:xlink="http://www.w3.org/1999/xlink" 
-        x="0px" 
-        y="0px" 
-        viewBox="0 0 477.175 477.175" 
-        style="enable-background:new 0 0 477.175 477.175;" 
-        xml:space="preserve"
-      >
-        <g>
-          <path 
-            style="fill: #fff;" 
-            d="M360.731,229.075l-225.1-225.1c-5.3-5.3-13.8-5.3-19.1,0s-5.3,13.8,0,19.1l215.5,215.5l-215.5,215.5c-5.3,5.3-5.3,13.8,0,19.1c2.6,2.6,6.1,4,9.5,4c3.4,0,6.9-1.3,9.5-4l225.1-225.1C365.931,242.875,365.931,234.275,360.731,229.075z"
-          ></path>
-        </g>
-      </svg>
-    </button>
-  
-    <ul>
-      <li id="exit">CHANGE PROFILE</li>
-      <li class="hide-eye"><a href="#">HIDE VIEW DOT</a><input type="checkbox" name="" id="hide-eye-checkbox"></li>
-      <li><a href="#">RESTART MODEL</a></li>
-    </ul>
-  
-    <div class="sidebar-footer">
-      <li><a href="#">CONTACTS</a></li>
-      <li><a href="#">POLITICS</a></li>
-      <li><a href="#">ABOUT US</a></li>
+    <div class="sidebar">
+      <button class="remove-sidebar">
+        <svg
+          class="custom-icon"
+          version="1.1"
+          id="Capa_1"
+          xmlns="http://www.w3.org/2000/svg"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          x="0px"
+          y="0px"
+          viewBox="0 0 477.175 477.175"
+          style="enable-background: new 0 0 477.175 477.175"
+          xml:space="preserve"
+        >
+          <g>
+            <path
+              style="fill: #fff"
+              d="M360.731,229.075l-225.1-225.1c-5.3-5.3-13.8-5.3-19.1,0s-5.3,13.8,0,19.1l215.5,215.5l-215.5,215.5c-5.3,5.3-5.3,13.8,0,19.1c2.6,2.6,6.1,4,9.5,4c3.4,0,6.9-1.3,9.5-4l225.1-225.1C365.931,242.875,365.931,234.275,360.731,229.075z"
+            ></path>
+          </g>
+        </svg>
+      </button>
+
+      <ul>
+        <li id="exit">CHANGE PROFILE</li>
+        <li class="hide-eye">
+          <a href="#">HIDE VIEW DOT</a
+          ><input type="checkbox" name="" id="hide-eye-checkbox" />
+        </li>
+        <li><a href="#">RESTART MODEL</a></li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <li><a href="#">CONTACTS</a></li>
+        <li><a href="#">POLITICS</a></li>
+        <li><a href="#">ABOUT US</a></li>
+      </div>
     </div>
-  </div>
 
-  <div class="main">
-    <canvas id="heatMap"></canvas>
+    <div class="main">
+      <canvas id="heatMap"></canvas>
 
-    <div id="training">
-      <div class="buttonwrap">
-        <div class="buttonrow">
-          <div class="buttons-for-overlay">
-            <button id="start-training" class="start-recording" style="padding: .3rem 3rem; width: 80%;">START RECORDING</button>
-            <button id="stop-recording" disabled>PAUSE</button>
-            <button id="finish-recording" disabled>FINISH</button>
+      <div id="training">
+        <div class="buttonwrap">
+          <div class="buttonrow">
+            <div class="buttons-for-overlay">
+              <button
+                id="start-training"
+                class="start-recording"
+                style="padding: 0.3rem 3rem; width: 90%;  font-family: 'Wix Madefor Display', sans-serif;"
+              >
+                START RECORDING
+              </button>
+              <button id="stop-recording" disabled style="width: 35%;">PAUSE</button>
+              <button id="finish-recording" disabled style="width: 35%;">FINISH</button>
+            </div>
           </div>
+        </div>
+      </div>
+
+      <div class="webcam-container">
+        <video id="webcam" width="400" height="300" autoplay></video>
+        <video id="uploaded-video" controls style="display: none"></video>
+        <canvas
+          id="overlay"
+          width="400"
+          height="300"
+          style="opacity: 0"
+        ></canvas>
+        <div class="video-upload">
+          <label for="video-uploader" class="custom-file-upload">
+            <p>UPLOAD VIDEO</p>
+            <svg
+            style="color: #fff;"
+            class="fas fa-upload"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+  <polyline points="7 10 12 15 17 10" />
+  <line x1="12" y1="15" x2="12" y2="3" />
+</svg>
+
+          </label>
+          <input type="file" id="video-uploader" accept="video/*" />
         </div>
       </div>
     </div>
 
-    <div class="webcam-container">
-      <video id="webcam" width="400" height="300" autoplay></video>
-      <video id="uploaded-video" controls style="display: none;"></video>
-      <canvas id="overlay" width="400" height="300" style="opacity: 0;"></canvas>
-      <div class="video-upload">
-        <label for="video-uploader" class="custom-file-upload">
-          <i class="fas fa-upload"></i> DOWNLOAD VIDEO
-        </label>
-        <input type="file" id="video-uploader" accept="video/*">
-      </div>
-    </div>
-  </div>
+    <canvas id="eyes" width="50" height="25"></canvas>
+    <div id="target"></div>
 
-  <canvas id="eyes" width="50" height="25"></canvas>
-  <div id="target"></div>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.5.0"></script>
+    <script src="clmtrackr.js"></script>
+    <script src="dataset.js"></script>
+    <script src="mouse.js"></script>
+    <script src="facetracker.js"></script>
+    <script src="ui.js"></script>
+    <script src="training.js"></script>
+    <script src="global.js"></script>
+    <script src="heat.js"></script>
+    <script src="main.js"></script>
+    <script src="entry.js"></script>
+    <script src="script.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const target = document.getElementById('target');
+        const hideEyeCheckbox = document.getElementById('hide-eye-checkbox');
+        const videoUpload = document.querySelector('.video-upload');
+        const videoInput = document.getElementById('video-uploader');
+        const uploadedVideo = document.getElementById('uploaded-video');
+        const webcam = document.getElementById('webcam');
 
-  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.5.0"></script>
-  <script src="clmtrackr.js"></script>
-  <script src="recording.js"></script>
-  <script src="dataset.js"></script>
-  <script src="mouse.js"></script>
-  <script src="facetracker.js"></script>
-  <script src="ui.js"></script>
-  <script src="training.js"></script>
-  <script src="global.js"></script>
-  <script src="heat.js"></script>
-  <script src="main.js"></script>
-  <script src="entry.js"></script>
-  <script src="script.js"></script>
-  <script>
-document.addEventListener('DOMContentLoaded', () => {
-  const target = document.getElementById('target');
-  const hideEyeCheckbox = document.getElementById('hide-eye-checkbox');
-  const videoUpload = document.querySelector('.video-upload');
-  const videoInput = document.getElementById('video-uploader');
-  const uploadedVideo = document.getElementById('uploaded-video');
-  const webcam = document.getElementById('webcam');
-
-  const updateEyeVisibility = () => {
-    target.style.opacity = hideEyeCheckbox.checked ? '0' : '1';
-  };
-  hideEyeCheckbox.addEventListener('change', updateEyeVisibility);
-  updateEyeVisibility();
-
-})
-
-
-  </script>
-</body>
+        const updateEyeVisibility = () => {
+          target.style.opacity = hideEyeCheckbox.checked ? '0' : '1';
+        };
+        hideEyeCheckbox.addEventListener('change', updateEyeVisibility);
+        updateEyeVisibility();
+      });
+    </script>
+  </body>
 </html>
 
