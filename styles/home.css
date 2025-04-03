@@ -544,6 +544,12 @@ button {
   }
 }
 
+@media (max-width: 750px) {
+  .video-upload {
+    left: 34%;
+  }
+}
+
 @media (max-width: 650px) {
   body {
     overflow-y: scroll;
@@ -559,6 +565,11 @@ button {
     display: flex;
     flex-direction: column;
   }
+
+  .header-text-content button {
+    transform: translateX(-11px) !important;
+  }
+  
 }
 
 @media (max-width: 390px) {
