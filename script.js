@@ -171,6 +171,8 @@ exit.addEventListener('click', () => {
 });
 
 //блок с загрузкой видео
+const removeVideoBtn = document.getElementById('remove-video');
+
 document.addEventListener('DOMContentLoaded', () => {
   const videoUploader = document.getElementById('video-uploader');
   if (videoUploader) {
@@ -183,6 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
           uploadedVideo.src = url;
           uploadedVideo.style.display = 'block';
           uploadedVideo.play();
+          removeVideoBtn.style.display = 'block';
         }
       }
     });
@@ -193,8 +196,30 @@ document
   .getElementById('video-uploader')
   .addEventListener('change', function () {
     const fileName = this.files[0] ? this.files[0].name : 'Загрузить видео';
-    document.querySelector('.custom-file-upload').textContent = fileName;
+    document.querySelector('.custom-file-upload').style.display = 'none';
   });
+
+removeVideoBtn.addEventListener('click', (event) => {
+  const uploadedVideo = document.getElementById('uploaded-video');
+  const videoUploader = document.getElementById('video-uploader');
+  const customUploadBtn = document.querySelector('.custom-file-upload');
+
+  if (uploadedVideo) {
+    uploadedVideo.src = '';
+    uploadedVideo.style.display = 'none';
+    uploadedVideo.pause();
+  }
+
+  if (videoUploader) {
+    videoUploader.value = '';
+  }
+
+  removeVideoBtn.style.display = 'none';
+
+  if (customUploadBtn) {
+    customUploadBtn.style.display = 'flex';
+  }
+});
 
 const player = document.getElementById('player');
 player.addEventListener('click', () => {
@@ -205,111 +230,106 @@ startTraining.addEventListener('click', () => {
   videoUploader.style.display = 'none';
 });
 
-
-
 // ..тепловая
 
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Твои стандартные элементы ---
-    const target = document.getElementById('target');
-    const hideEyeCheckbox = document.getElementById('hide-eye-checkbox');
-    const videoUpload = document.querySelector('.video-upload');
-    const videoInput = document.getElementById('video-uploader');
-    const uploadedVideo = document.getElementById('uploaded-video');
-    const webcam = document.getElementById('webcam');
+  // --- Твои стандартные элементы ---
+  const target = document.getElementById('target');
+  const hideEyeCheckbox = document.getElementById('hide-eye-checkbox');
+  const videoUpload = document.querySelector('.video-upload');
+  const videoInput = document.getElementById('video-uploader');
+  const uploadedVideo = document.getElementById('uploaded-video');
+  const webcam = document.getElementById('webcam');
 
-    // Функция скрыть / показать точку
-    const updateEyeVisibility = () => {
-        target.style.opacity = hideEyeCheckbox.checked ? '0' : '1';
-    };
-    hideEyeCheckbox.addEventListener('change', updateEyeVisibility);
-    updateEyeVisibility();
+  // Функция скрыть / показать точку
+  const updateEyeVisibility = () => {
+    target.style.opacity = hideEyeCheckbox.checked ? '0' : '1';
+  };
+  hideEyeCheckbox.addEventListener('change', updateEyeVisibility);
+  updateEyeVisibility();
 
-    // --- HeatMap система ---
 
-    const canvas = document.getElementById('heatMap');
-    const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+  const canvas = document.getElementById('heatMap');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
 
-    let recording = false;
-    const points = [];
+  let recording = false;
+  const points = [];
 
-    // Обработка кнопок
-    const startButton = document.getElementById('start-training');
-    const stopButton = document.getElementById('stop-recording');
-    const finishButton = document.getElementById('finish-recording');
+  const startButton = document.getElementById('start-training');
+  const stopButton = document.getElementById('stop-recording');
+  const finishButton = document.getElementById('finish-recording');
 
-    startButton.addEventListener('click', () => {
-        recording = true;
-        points.length = 0; // очистить перед новой записью
-        startButton.disabled = true;
-        stopButton.disabled = false;
-        finishButton.disabled = false;
-        drawHeatMap();
+  startButton.addEventListener('click', () => {
+    recording = true;
+    points.length = 0;
+    startButton.disabled = true;
+    stopButton.disabled = false;
+    finishButton.disabled = false;
+    drawHeatMap();
+  });
+
+  stopButton.addEventListener('click', () => {
+    recording = false;
+    startButton.disabled = false;
+    stopButton.disabled = true;
+  });
+
+  finishButton.addEventListener('click', () => {
+    recording = false;
+    startButton.disabled = false;
+    stopButton.disabled = true;
+    finishButton.disabled = true;
+  });
+
+  // Основной цикл отрисовки
+  function drawHeatMap() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    points.forEach((p) => {
+      const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 50);
+      gradient.addColorStop(0, 'rgba(255, 0, 0, 0.4)');
+      gradient.addColorStop(1, 'rgba(255, 0, 0, 0)');
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 50, 0, 2 * Math.PI);
+      ctx.fill();
     });
 
-    stopButton.addEventListener('click', () => {
-        recording = false;
-        startButton.disabled = false;
-        stopButton.disabled = true;
-    });
-
-    finishButton.addEventListener('click', () => {
-        recording = false;
-        startButton.disabled = false;
-        stopButton.disabled = true;
-        finishButton.disabled = true;
-    });
-
-    // Основной цикл отрисовки
-    function drawHeatMap() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        points.forEach(p => {
-            const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 50);
-            gradient.addColorStop(0, 'rgba(255, 0, 0, 0.4)');
-            gradient.addColorStop(1, 'rgba(255, 0, 0, 0)');
-            ctx.fillStyle = gradient;
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, 50, 0, 2 * Math.PI);
-            ctx.fill();
-        });
-
-        if (recording) {
-            const rect = canvas.getBoundingClientRect();
-            const targetX = target.offsetLeft + target.offsetWidth / 2;
-            const targetY = target.offsetTop + target.offsetHeight / 2;
-            points.push({ x: targetX, y: targetY });
-        }
-
-        requestAnimationFrame(drawHeatMap);
+    if (recording) {
+      const rect = canvas.getBoundingClientRect();
+      const targetX = target.offsetLeft + target.offsetWidth / 2;
+      const targetY = target.offsetTop + target.offsetHeight / 2;
+      points.push({ x: targetX, y: targetY });
     }
-});
 
+    requestAnimationFrame(drawHeatMap);
+  }
+});
 
 const newAuth = {
   title: 'Harry Potter',
   body: 'shot',
   userId: 1,
-}
+};
 
 fetch('http://217.114.10.197:8000/users', {
   method: 'POST',
   body: JSON.stringify(newAuth),
   headers: {
     'Content-type': 'application/json; charset=UTF-8',
-  }
+  },
 })
-.then((response) => {
-  if (!response.ok) {
-    throw new Error(`Ошибка: ${response.status}`);
-  }
-  return response.json();
-})
-.then((data) => {
-  console.log(data)
-})
-.catch((error) => {
-  console.error(error)
-})
+  .then((response) => {
+    if (!response.ok) {
+      throw new Error(`Ошибка: ${response.status}`);
+    }
+    return response.json();
+  })
+  .then((data) => {
+    console.log(data);
+  })
+  .catch((error) => {
+    console.error(error);
+  });

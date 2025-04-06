@@ -126,7 +126,7 @@ form {
   color: #1d1e27 !important;
   font-weight: 500;
   font-size: 1.1rem;
-  opacity: .8;
+  opacity: 0.8;
 }
 
 .auth-form button {
@@ -406,7 +406,6 @@ input[type='checkbox'] {
     display: flex;
     flex-direction: column;
   }
-  
 }
 
 @media (max-width: 310px) {

@@ -27,6 +27,7 @@ $(document).ready(function () {
     a.download = fileName;
     a.click();
   }
+  z;
 
   $('body').keyup(function (e) {
     if (e.keyCode === 32 && ui.readyToCollect) {
@@ -92,4 +93,3 @@ $(document).ready(function () {
     ui.onFinishTraining();
   });
 });
-

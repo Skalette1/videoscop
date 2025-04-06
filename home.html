@@ -25,9 +25,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-    href="https://fonts.googleapis.com/css2?family=Wix+Madefor+Display:wght@400;500;600;700;800&display=swap"
-    rel="stylesheet"
-  />  
+      href="https://fonts.googleapis.com/css2?family=Wix+Madefor+Display:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
   </head>
 
   <body>
@@ -35,12 +35,22 @@
     <header>
       <div class="header-text-content">
         <h1>
-          VIDEO<span id="recording"
-            ><img src="public/record.png" height="50" width="50" alt="" /></span
-          >SCOP
+          VIDE<span id="letter-o">O</span
+          ><span id="recording"
+            ><img src="public/record.png" height="50" width="50" alt="" />
+          </span>
+          <div class="pause-icon"></div>
+          SCOP
         </h1>
         <navbar>
-          <button id="player" style="color: #e8162e; cursor: pointer;   font-family: 'Wix Madefor Display', sans-serif;">
+          <button
+            id="player"
+            style="
+              color: #e8162e;
+              cursor: pointer;
+              font-family: 'Wix Madefor Display', sans-serif;
+            "
+          >
             SESSIONS
           </button>
         </navbar>
@@ -109,12 +119,20 @@
               <button
                 id="start-training"
                 class="start-recording"
-                style="padding: 0.3rem 3rem; width: 90%;  font-family: 'Wix Madefor Display', sans-serif;"
+                style="
+                  padding: 0.3rem 3rem;
+                  width: 90%;
+                  font-family: 'Wix Madefor Display', sans-serif;
+                "
               >
                 START RECORDING
               </button>
-              <button id="stop-recording" disabled style="width: 35%;">PAUSE</button>
-              <button id="finish-recording" disabled style="width: 35%;">FINISH</button>
+              <button id="stop-recording" disabled style="width: 30%">
+                PAUSE
+              </button>
+              <button id="finish-recording" disabled style="width: 30%">
+                FINISH
+              </button>
             </div>
           </div>
         </div>
@@ -129,27 +147,29 @@
           height="300"
           style="opacity: 0"
         ></canvas>
+
+        <img src="public/remove.png" alt="remove a video" id="remove-video" />
+
         <div class="video-upload">
           <label for="video-uploader" class="custom-file-upload">
             <p>UPLOAD VIDEO</p>
             <svg
-            style="color: #fff;"
-            class="fas fa-upload"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-  <polyline points="7 10 12 15 17 10" />
-  <line x1="12" y1="15" x2="12" y2="3" />
-</svg>
-
+              style="color: #fff"
+              class="fas fa-upload"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
           </label>
           <input type="file" id="video-uploader" accept="video/*" />
         </div>
@@ -190,4 +210,3 @@
     </script>
   </body>
 </html>
-

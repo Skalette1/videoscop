@@ -60,7 +60,7 @@ window.training = {
     batchSize = Math.max(2, Math.min(batchSize, 64));
 
     $('#start-training').prop('disabled', true);
-    $('#start-training').html('In Progress...');
+    $('#start-training').html('START RECORDING');
 
     if (training.currentModel == null) {
       training.currentModel = training.createModel();
@@ -115,7 +115,7 @@ window.training = {
           training.currentModel = await tf.loadLayersModel(bestModelPath);
 
           $('#start-training').prop('disabled', false);
-          $('#start-training').html('Start Training');
+          $('#start-training').html('START RECORDING');
           training.inTraining = false;
           ui.onFinishTraining();
         },
