@@ -481,6 +481,23 @@ button {
   display: block;
 }
 
+::-webkit-scrollbar {
+  width: 15px;
+  height: 15px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #47474b;
+  border-radius: 2rem;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #e8162e;
+  box-shadow: inset 2px 5px 10px #000000;
+  border-radius: 1rem;
+  transition: .5s all ease-in-out;
+}
+
 .video-upload.show {
   opacity: 1;
   visibility: visible;
