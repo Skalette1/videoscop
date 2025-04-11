@@ -406,6 +406,10 @@ input[type='checkbox'] {
     display: flex;
     flex-direction: column;
   }
+
+  #dont-have-acc {
+    margin: 0 auto !important;
+  }
 }
 
 @media (max-width: 310px) {
