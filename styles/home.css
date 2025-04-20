@@ -121,9 +121,11 @@ h1 {
   box-shadow: inset 25px 25px 40px rgba(0, 0, 0, 0.25);
   transition: right 0.8s ease-in-out;
 }
+
 .sidebar.open {
   right: 0;
 }
+
 .sidebar ul {
   color: var(--main-color);
   list-style: none;
@@ -495,7 +497,7 @@ button {
   background-color: #e8162e;
   box-shadow: inset 2px 5px 10px #000000;
   border-radius: 1rem;
-  transition: .5s all ease-in-out;
+  transition: 0.5s all ease-in-out;
 }
 
 .video-upload.show {
@@ -531,6 +533,52 @@ button {
 
 .fa-upload {
   transform: scale(1.3);
+}
+
+.name-for-video {
+  display: none;
+  position: absolute;
+  top: 35%;
+  left: 45%;
+  transform: translate(-50%, -50%);
+  z-index: 10000;
+  background-color: rgba(255, 255, 255, 0.4);
+  border-radius: 1rem;
+  padding: 1.7rem;
+  box-shadow: 0 0 3px var(--main-color);
+}
+
+h3 {
+  color: var(--main-color);
+  font-size: 1.4rem;
+  text-align: center;
+}
+
+.name-for-video input {
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.45rem;
+  border-radius: 1rem;
+  border: none;
+}
+
+.name-for-video button {
+  color: var(--main-color);
+  background: linear-gradient(
+    90deg,
+    var(--main-color) 50%,
+    var(--main-backgroundColor) 50%
+  );
+  background-size: 200% 100%;
+  background-position: right bottom;
+  transition: all 0.4s ease-in-out;
+  position: relative;
+  z-index: 1;
+}
+
+.name-for-video button:hover {
+  color: var(--main-backgroundColor);
+  background-position: left bottom;
 }
 
 @keyframes pulse {
@@ -582,7 +630,7 @@ button {
 
 @media (max-width: 750px) {
   .video-upload {
-    left: 34%;
+    left: 30.5%;
   }
 
   #target {
@@ -591,6 +639,27 @@ button {
 
   .header-text-content button {
     transform: translate(22px, -3rem) !important;
+  }
+
+  .name-for-video {
+    display: flex;
+    flex-direction: column;
+    align-items: center !important;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 1);
+  }
+
+  h3 {
+    color: var(--main-backgroundColor);
+  }
+
+  .name-for-video input {
+    color: var(--main-color);
+    background-color: var(--main-backgroundColor);
+  }
+
+  .name-for-video input::placeholder {
+    color: var(--main-color);
   }
 }
 

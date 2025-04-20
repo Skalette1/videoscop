@@ -37,7 +37,13 @@
         <h1>
           VIDE<span id="letter-o">O</span
           ><span id="recording"
-            ><img src="public/record.png" height="50" width="50" alt="" />
+            ><img
+              src="public/record.png"
+              height="50"
+              width="50"
+              alt="recording"
+              id="recording-button"
+            />
           </span>
           <div class="pause-icon"></div>
           SCOP
@@ -174,10 +180,23 @@
           <input type="file" id="video-uploader" accept="video/*" />
         </div>
       </div>
+      <div id="target"></div>
+    </div>
+
+    <div class="name-for-video">
+      <h3>VIDEO TITLE</h3>
+      <input
+        type="text"
+        placeholder="VIDEO NAME"
+        id="video-name-input"
+        minlength="3"
+        maxlength="50"
+        required
+      />
+      <button id="add-video">ADD</button>
     </div>
 
     <canvas id="eyes" width="50" height="25"></canvas>
-    <div id="target"></div>
 
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.5.0"></script>
@@ -206,6 +225,27 @@
         };
         hideEyeCheckbox.addEventListener('change', updateEyeVisibility);
         updateEyeVisibility();
+
+        const player = document.getElementById('player');
+        player.addEventListener('click', () => {
+          window.location.href = 'player.html';
+        });
+      });
+      const sidebar = document.querySelector('.sidebar');
+      const settingsBtn = document.getElementById('settings-btn');
+      const removeSidebar = document.querySelector('.remove-sidebar');
+      const exitBtn = document.getElementById('exit');
+
+      settingsBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+      });
+
+      removeSidebar.addEventListener('click', () => {
+        sidebar.classList.remove('open');
+      });
+
+      exitBtn.addEventListener('click', () => {
+        window.location.href = 'index.html';
       });
     </script>
   </body>

@@ -146,19 +146,21 @@
 
       <canvas id="heatmap-canvas"></canvas>
 
-   <div class="controls">
-  <div class="controls-button">
-    <img src="/public/ARROW2.svg" alt="backward" class="icon" />
-    <button id="frame-backward" class="btn">FRAME BACK</button>
-  </div>
+      <div class="controls">
+        <div class="controls-button">
+          <img src="/public/ARROW2.svg" alt="backward" class="icon" />
+          <button id="frame-backward" class="btn">FRAME BACK</button>
+        </div>
 
-  <button id="toggle-heatmap" class="btn primary">DRAW / RESET HEAT MAP</button>
+        <button id="toggle-heatmap" class="btn primary">
+          DRAW / RESET HEAT MAP
+        </button>
 
-  <div class="controls-button">
-    <button id="frame-forward" class="btn">FRAME FORWARD</button>
-    <img src="/public/ARROW2.svg" alt="forward" class="icon" />
-  </div>
-</div>
+        <div class="controls-button">
+          <button id="frame-forward" class="btn">FRAME FORWARD</button>
+          <img src="/public/ARROW2.svg" alt="forward" class="icon" />
+        </div>
+      </div>
     </div>
     <script src="script.js"></script>
     <script src="heat.js"></script>
@@ -174,28 +176,50 @@
         .addEventListener('click', () => {
           window.location.href = 'home.html';
         });
-      document.addEventListener('DOMContentLoaded', () => {
+
+      document.addEventListener('DOMContentLoaded', async () => {
         const videoPlayer = document.getElementById('video-player');
         const heatmapCanvas = document.getElementById('heatmap-canvas');
         const ctx = heatmapCanvas.getContext('2d');
         const frameBackwardButton = document.getElementById('frame-backward');
         const frameForwardButton = document.getElementById('frame-forward');
+        const toggleHeatmapButton = document.getElementById('toggle-heatmap');
 
         let isHeatmapVisible = false;
-
-        let dataset = []; 
+        let dataset = [];
         let training = { currentModel: null };
 
-        const videoData = localStorage.getItem('videoBlob');
-        if (videoData) {
-          const videoBlob = dataURLToBlob(videoData);
-          const videoSource = document.getElementById('video-source');
-          videoSource.src = URL.createObjectURL(videoBlob);
-          videoPlayer.load();
-        } else {
-          alert('Видео не найдено!');
+        try {
+          // Получаем список видео с сервера
+          const response = await fetch('https://example.com/upload/video.mp4', {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error('Ошибка получения видео');
+          }
+
+          const videos = await response.json();
+
+          if (videos.length > 0) {
+            // Берем последнее видео (или можно реализовать выбор)
+            const latestVideo = videos[videos.length - 1];
+
+            // Устанавливаем источник видео
+            videoPlayer.src = `"https://example.com/upload/video.mp4"
+}/${latestVideo.id}/stream`;
+            videoPlayer.load();
+          } else {
+            alert('Видео не найдено!');
+          }
+        } catch (error) {
+          console.error('Ошибка:', error);
+          alert('Ошибка при загрузке видео: ' + error.message);
         }
 
+        // Обработчики кнопок остаются без изменений
         frameBackwardButton.addEventListener('click', () => {
           videoPlayer.currentTime = Math.max(0, videoPlayer.currentTime - 0.07);
         });
@@ -206,18 +230,6 @@
             videoPlayer.currentTime + 0.07
           );
         });
-
-        function dataURLToBlob(dataURL) {
-          const byteString = atob(dataURL.split(',')[1]);
-          const arrayBuffer = new ArrayBuffer(byteString.length);
-          const uintArray = new Uint8Array(arrayBuffer);
-
-          for (let i = 0; i < byteString.length; i++) {
-            uintArray[i] = byteString.charCodeAt(i);
-          }
-
-          return new Blob([uintArray], { type: 'video/webm' });
-        }
       });
     </script>
   </body>

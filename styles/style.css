@@ -390,7 +390,7 @@ input[type='checkbox'] {
   }
 
   .remember-label {
-    flex-direction: column;
+    flex-direction: column-reverse;
     align-items: center;
   }
 
