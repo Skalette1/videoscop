@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Authorization</title>
   <link rel="icon" href="public/Untitled_logo_1_free-file.jpg" />
   <link rel="stylesheet" href="styles/style.css" />
@@ -174,19 +174,6 @@
       const container = document.querySelector('.container');
       const cookies = document.querySelector('.cookies');
       const errorElement = document.querySelector('.error');
-
-      document.addEventListener('DOMContentLoaded', function() {
-  let viewport = document.querySelector('meta[name="viewport"]');
-  function updateViewport() {
-    if (window.outerWidth <= 490) {
-      viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
-    } else {
-      viewport.setAttribute('content', 'width=device-width, initial-scale=1.0');
-    }
-  }
-  window.addEventListener('resize', updateViewport);
-  updateViewport();
-});
 
       function showError(message) {
         errorElement.innerHTML = `
