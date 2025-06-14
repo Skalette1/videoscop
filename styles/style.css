@@ -417,3 +417,28 @@ input[type='checkbox'] {
     transform: translateX(1rem) !important;
   }
 }
+
+@media (hover: none) and (pointer: coarse) {
+  /* Стили только для тач-устройств */
+  body {
+    -webkit-text-size-adjust: 100%;
+    touch-action: manipulation;
+  }
+  
+  .container {
+    min-width: 100vw;
+    overflow-x: hidden;
+  }
+}
+@media (max-width: 490px) {
+  .auth-form {
+    padding: 0 15px;
+  }
+  
+  .auth-form input, 
+  .auth-form button {
+    width: 100% !important;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+}
